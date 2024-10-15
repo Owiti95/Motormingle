@@ -1,8 +1,15 @@
-from sqlalchemy_serializer import SerializerMixin
+
 from sqlalchemy.orm import validates
 from config import db
-import re
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
+from sqlalchemy_serializer import SerializerMixin
 import bcrypt
+
+metadata=MetaData()
+
+#create the Flask SQLAlchemy extension
+db =SQLAlchemy(metadata=metadata)
 
 
 class User(db.Model,SerializerMixin):

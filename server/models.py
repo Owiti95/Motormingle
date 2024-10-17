@@ -124,7 +124,7 @@ class RSVP(db.Model, SerializerMixin):
 class Category(db.Model, SerializerMixin):
     __tablename__ = 'categories'
 
-    serialize_rules = ('-events.categories', '-events.user')
+    serialize_rules = ('-events.categories','-events.user')
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)

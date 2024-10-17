@@ -1,82 +1,37 @@
-
-// import React, { useEffect, useState } from "react";
-// import { Switch, Route } from "react-router-dom";
-
-// function App() {
-//   return <h1>Project Client</h1>;
-// }
-
-// export default App;
-// import React from 'react';
-// import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-// // import SearchBar from './components/SearchBar';
-// import EventDetails from './EventDetails';
-// import EventList from './EventList';
-// // import Home from './pages/Home';
-// // import Events from './pages/Events';
-// // import './index.css';
-
-// const App = () => {
-//     return (
-//         <Router>
-//             {/* <Navbar /> */}
-//             <Switch>
-//                 {/* <Route path="/" exact component={Home} /> */}
-//                 <Route path="/events" component={EventList}/>
-//                 <Route path="/events/:id" component={EventDetails} />
-//                 {/* Add other routes here */}
-//             </Switch>
-//         </Router>
-//     );
-// };
-
-// export default App;
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-// import Navbar from './components/Navbar'; // Uncomment if you have a Navbar component
-import EventDetails from './EventDetails'; // Ensure the path is correct
-import EventList from './EventList'; // Ensure the path is correct
-import BookingDetails from './BookingDetails';
-// import './index.css'; // Ensure your CSS is imported if needed
+import React, { useState } from 'react';
+import Login from './Login';
+import Register from './Register';
+import { UserProvider } from './UserContext'; // Import UserProvider
 
 const App = () => {
-    return (
-        <Router>
-            {/* <Navbar /> */} {/* Uncomment if you have a Navbar */}
-            <Switch>
-                {/* <Route path="/" exact component={Home} /> */} {/* Uncomment for Home route */}
-                <Route path="/events" component={EventList} />
-                <Route path="/events/:id" component={EventDetails} />
-                <Route path="/booking/:id" component={BookingDetails} />
-            </Switch>
-        </Router>
-    );
-=======
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminDashboard from "./AdminDashboard";
-import Home from "./Home";
-import ProtectedRoute from "./RouteProtection";
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
-const App = () => {
-  const is_admin = true; // Replace with actual admin check logic
+  const handleLoginButtonClick = () => {
+    setShowLogin((prev) => !prev); // Toggle the visibility of the login form
+    setShowRegister(false); // Hide Register if Login is shown
+  };
+
+  const handleRegisterButtonClick = () => {
+    setShowRegister((prev) => !prev); // Toggle the visibility of the register form
+    setShowLogin(false); // Hide Login if Register is shown
+  };
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute is_admin={is_admin}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </Router>
+    <UserProvider> {/* Wrap the whole app with UserProvider */}
+      <div>
+        <h1>Welcome to Motormingle</h1>
+        <button onClick={handleRegisterButtonClick}>
+          {showRegister ? ' X ' : 'Register'}
+        </button>
+        {showRegister && <Register />}
+        <button onClick={handleLoginButtonClick}>
+          {showLogin ? ' X ' : 'Login'}
+        </button>
+        {showLogin && <Login />}
+      </div>
+    </UserProvider>
   );
-
 };
 
 export default App;

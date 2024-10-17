@@ -21,7 +21,9 @@ with app.app_context():
             User(name="Isaac", email="isaac@example.com", password_hash=bcrypt.generate_password_hash("password").decode('utf-8')),
             User(name="Elsie", email="elsie@example.com", password_hash=bcrypt.generate_password_hash("password").decode('utf-8')),
             User(name="Baimet", email="baimet@example.com", password_hash=bcrypt.generate_password_hash("password").decode('utf-8')),
-        ]
+            User(name="AdminUser", email="adminuser@example.com", password_hash=bcrypt.generate_password_hash("password").decode('utf-8'), is_admin=True),
+    ]
+        
         db.session.add_all(users)
         db.session.commit()
         print("Users added successfully.")

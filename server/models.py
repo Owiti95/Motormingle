@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, Table  # MetaData for schema definition & table for defining association tables
 from sqlalchemy_serializer import SerializerMixin
 from flask_bcrypt import Bcrypt
+import re
 
 
 bcrypt = Bcrypt()
@@ -31,6 +32,19 @@ class User(db.Model, SerializerMixin):
     
     # one user can create multiple events (One-to-Many relationship)
     events = db.relationship('Event', back_populates='user')
+
+
+
+    # Email validation method
+    @validates('email')
+    def validate_email(self, key, email):
+        # Regular expression for validating an email
+        valid_email = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(valid_email, email):
+            raise ValueError("Invalid email")
+        return email
+
+
 
     # method to set password (hashes the password using bcrypt)
     def set_password(self, password):

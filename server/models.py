@@ -126,7 +126,7 @@ metadata = MetaData()
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
-    serialize_rules = ('-rsvps.users', '-events.users',)  # exclude circular references when serializing
+    serialize_rules = ('-events', '-rsvps.user', '-rsvps.event') # exclude circular references when serializing
     
     # Define columns in the users table
     id = db.Column(db.Integer, primary_key=True)  # Primary key as unique identifier
@@ -178,7 +178,7 @@ event_categories = Table('event_categories', db.Model.metadata,
 class Event(db.Model, SerializerMixin):
     __tablename__ = 'events'
 
-    serialize_rules = ('-rsvps.events', '-categories.events',)
+    serialize_rules = ('-user.events', '-rsvps.event', '-categories.events')
     
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
@@ -203,7 +203,7 @@ class Event(db.Model, SerializerMixin):
 class RSVP(db.Model, SerializerMixin):
     __tablename__ = 'rsvps'
 
-    serialize_rules = ('-user.rsvps', 'event.rsvps',)
+    serialize_rules = ('-user.rsvps', '-event.rsvps', '-user.events')
     
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String, nullable=False)  # RSVP status
@@ -233,7 +233,7 @@ class RSVP(db.Model, SerializerMixin):
 class Category(db.Model, SerializerMixin):
     __tablename__ = 'categories'
 
-    serialize_rules = ('-events.categories',)
+    serialize_rules = ('-events.categories', '-events.user')
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)

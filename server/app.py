@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 
-# Standard library imports
-
 # Remote library imports
 from flask import Flask, request, session
 from flask_restful import Api, Resource
 from flask_migrate import Migrate
 from flask_cors import CORS
-from flask_bcrypt import Bcrypt
+
 
 # Local imports
 from config import db
@@ -16,23 +14,19 @@ from models import User, Event, RSVP, Category
 # Initialize the Flask app
 app = Flask(__name__)
 
-# Set secret key for sessions
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../instance/app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Enable CORS
 CORS(app)
 
 # Initialize the database and migration
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# Initialize Flask-RESTful
+# Initialize Flask-RESTful and Bcrypt
 api = Api(app)
 
-# Initialize bcrypt
-bcrypt = Bcrypt(app)
 
 # Helper function to check if user is an admin
 def is_admin():
@@ -77,13 +71,15 @@ class Login(Resource):
         else:
             return {"error": "Invalid credentials"}, 401
 
-# Resource for event management (non-admin)
+# Event list for non-admins
 class EventList(Resource):
     def get(self):
         events = Event.query.all()
-        return [event.to_dict() for event in events], 200
+        # Use limited serialization to avoid circular references
+        return [event.to_dict(rules=('-rsvps.event', '-categories.events')) for event in events], 200
 
-# Resource for RSVP (non-admin)
+
+# RSVP resource
 class RSVPList(Resource):
     def post(self, event_id):
         data = request.json
@@ -104,21 +100,24 @@ class RSVPList(Resource):
         db.session.commit()
         return rsvp.to_dict(), 201
 
-# Admin-specific dashboard for managing events and attendees
+# Admin dashboard for event management
 class AdminDashboard(Resource):
     def get(self):
+        # Check if the user is an admin
         if not is_admin():
             return {"error": "Admin privileges required"}, 403
 
+        # Query all events and RSVPs
         events = Event.query.all()
         rsvps = RSVP.query.all()
 
+        # Serialize events and RSVPs with rules to avoid recursion
         return {
-            "events": [event.to_dict() for event in events],
-            "attendees": [rsvp.to_dict() for rsvp in rsvps]
+            "events": [event.to_dict(rules=('-rsvps', '-categories')) for event in events],
+            "attendees": [rsvp.to_dict(rules=('-event', '-user')) for rsvp in rsvps]
         }, 200
 
-# Admin-specific route for event management
+# Admin event creation and management
 class AdminEvent(Resource):
     def post(self):
         if not is_admin():
@@ -129,16 +128,20 @@ class AdminEvent(Resource):
         description = data.get('description')
         date_of_event = data.get('date_of_event')
         location = data.get('location')
-        category_id = data.get('category_id')
+        category_ids = data.get('category_ids', []) 
 
         event = Event(
             title=title,
             description=description,
             date_of_event=date_of_event,
             location=location,
-            category_id=category_id,
             user_id=session.get('user_id')
         )
+
+        # Associate categories with the event
+        categories = Category.query.filter(Category.id.in_(category_ids)).all()
+        event.categories.extend(categories)
+
         db.session.add(event)
         db.session.commit()
 
@@ -162,6 +165,7 @@ class AdminEvent(Resource):
         db.session.commit()
         return event.to_dict(), 200
 
+
     def delete(self, event_id):
         if not is_admin():
             return {"error": "Admin privileges required"}, 403
@@ -181,7 +185,8 @@ class AdminEventAttendees(Resource):
             return {"error": "Admin privileges required"}, 403
 
         rsvps = RSVP.query.filter_by(event_id=event_id).all()
-        return [rsvp.to_dict() for rsvp in rsvps], 200
+        return [rsvp.to_dict(rules=('-user', '-event')) for rsvp in rsvps], 200  # Exclude user and event from rsvps
+
 
 # Resource for logout
 class Logout(Resource):

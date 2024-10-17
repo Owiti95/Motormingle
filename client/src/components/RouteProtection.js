@@ -1,8 +1,8 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ isAdmin, children }) => {
-  if (!isAdmin) {
+const ProtectedRoute = ({ is_admin, children }) => {
+  if (!is_admin) {
     return <Navigate to="/" />;
   }
   return children;

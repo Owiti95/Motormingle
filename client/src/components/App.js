@@ -2,10 +2,10 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminDashboard from "./AdminDashboard";
 import Home from "./Home";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./RouteProtection";
 
 const App = () => {
-  const is_Admin = true; // Replace with actual admin check logic
+  const is_admin = true; // Replace with actual admin check logic
 
   return (
     <Router>
@@ -14,7 +14,7 @@ const App = () => {
         <Route
           path="/admin"
           element={
-            <ProtectedRoute is_Admin={is_Admin}>
+            <ProtectedRoute is_admin={is_admin}>
               <AdminDashboard />
             </ProtectedRoute>
           }

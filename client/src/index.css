@@ -5,3 +5,88 @@
   --text: hsla(0, 0%, 100%, 0.88);
 }
 
+.event-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.event-list li {
+  margin: 10px 0;
+}
+
+.loading {
+  font-size: 20px;
+  color: blue;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+}
+/* General styles for the event list */
+.event-list {
+  max-width: 1200px; /* Set a max width for the list */
+  margin: 0 auto; /* Center the list */
+  padding: 20px; /* Add some padding around the list */
+}
+
+.event-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Space between cards */
+  justify-content: center; /* Center the cards */
+}
+
+.event-card {
+  border: 1px solid #ccc; /* Card border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 16px; /* Inner padding */
+  width: 300px; /* Fixed card width */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  text-align: center; /* Center text */
+  display: flex; /* Flexbox for layout */
+  flex-direction: column; /* Stack items vertically */
+}
+
+.event-image {
+  width: 100%; /* Make image responsive */
+  height: 200px; /* Fixed height for uniformity */
+  object-fit: cover; /* Maintain aspect ratio */
+  border-radius: 8px 8px 0 0; /* Rounded corners for top */
+}
+
+.booking-button {
+  background-color: #007bff; /* Button color */
+  color: white; /* Button text color */
+  border: none; /* No border */
+  padding: 10px 15px; /* Padding for the button */
+  border-radius: 5px; /* Rounded button corners */
+  cursor: pointer; /* Pointer on hover */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.booking-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.search-bar {
+  width: 100%; /* Full width */
+  padding: 10px; /* Padding inside the input */
+  margin-bottom: 20px; /* Space below the input */
+  border: 1px solid #ccc; /* Border for the input */
+  border-radius: 5px; /* Rounded corners for input */
+}
+
+/* Loading and error messages */
+.loading, .error {
+  text-align: center; /* Center text */
+  margin: 20px 0; /* Space above and below */
+  font-size: 1.2em; /* Increase font size */
+}
+
+/* No events found message */
+.no-results {
+  text-align: center; /* Center text */
+  font-size: 1.2em; /* Increase font size */
+  color: #777; /* Lighter text color */
+}

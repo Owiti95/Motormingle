@@ -1,11 +1,19 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { Route, Redirect } from "react-router-dom";
+import { UserContext } from "./UserContext";
 
-const ProtectedRoute = ({ is_admin, children }) => {
-  if (!is_admin) {
-    return <Navigate to="/" />;
-  }
-  return children;
+const ProtectedRoute = ({ component: Component, ...rest }) => {
+  const { user } = useContext(UserContext);
+  const is_admin = user?.is_admin;
+
+  return (
+    <Route
+      {...rest}
+      render={(props) =>
+        is_admin ? <Component {...props} /> : <Redirect to="/login" />
+      }
+    />
+  );
 };
 
 export default ProtectedRoute;

@@ -1,4 +1,3 @@
-// AdminDashboard.js
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EventList from "./EventList";
@@ -10,6 +9,7 @@ const AdminDashboard = () => {
   const [attendees, setAttendees] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false); // State to track if user is admin
 
   useEffect(() => {
     // Fetch events and attendees for the admin dashboard
@@ -18,11 +18,18 @@ const AdminDashboard = () => {
       .then((response) => {
         setEvents(response.data.events);
         setAttendees(response.data.attendees);
+        setIsAdmin(true); // Assume successful response means the user is an admin
       })
       .catch((error) => {
         setError("Error fetching admin data. Please try again.");
+        setIsAdmin(false); // If there's an error, assume the user is not an admin
       });
   }, []);
+
+  // Function to handle adding newly created events to the list
+  const handleEventCreated = (newEvent) => {
+    setEvents((prevEvents) => [...prevEvents, newEvent]);
+  };
 
   return (
     <div>
@@ -44,8 +51,13 @@ const AdminDashboard = () => {
         <p>No attendees found.</p>
       )}
 
-      <h3>Create New Event</h3>
-      <CreateEvent onEventCreated={setEvents} />
+      {/* Only show CreateEvent if the user is an admin */}
+      {isAdmin && (
+        <>
+          <h3>Create New Event</h3>
+          <CreateEvent onEventCreated={handleEventCreated} />
+        </>
+      )}
     </div>
   );
 };

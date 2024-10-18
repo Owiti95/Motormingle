@@ -20,10 +20,13 @@ const CreateEvent = ({ onEventCreated }) => {
       category_id,
     };
 
+    // Adjust the route to match the backend
     axios
-      .post("/admin/events", newEvent)
+      .post("/admin/dashboard/event", newEvent)
       .then((response) => {
+        // Add the created event to the existing list
         onEventCreated((prevEvents) => [...prevEvents, response.data]);
+        // Clear input fields after successful submission
         setTitle("");
         setDateOfEvent("");
         setLocation("");

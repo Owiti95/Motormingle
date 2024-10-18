@@ -90,3 +90,36 @@
   font-size: 1.2em; /* Increase font size */
   color: #777; /* Lighter text color */
 }
+
+.navbar {
+  background-color: var(--bg); /* Set the background color */
+  padding: 10px 20px; /* Add padding for space */
+  display: flex;
+  justify-content: space-between; /* Space out the nav items */
+  align-items: center; /* Align vertically */
+  position: sticky; /* Stick to the top when scrolling */
+  top: 0;
+  z-index: 100; /* Ensure navbar stays on top */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+}
+
+.navbar .nav-link {
+  color: var(--link); /* Set link color */
+  text-decoration: none; /* Remove underline */
+  font-size: 18px; /* Increase font size */
+  font-weight: 500; /* Slightly bolder text */
+  padding: 8px 12px; /* Add space inside each link */
+  transition: color 0.3s, background-color 0.3s; /* Smooth hover effects */
+}
+
+.navbar .nav-link:hover {
+  color: var(--header); /* Change color on hover */
+  background-color: rgba(255, 255, 255, 0.1); /* Light background on hover */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.navbar .nav-link.active {
+  color: var(--header); /* Active link color */
+  font-weight: 700; /* Bold active link */
+  border-bottom: 2px solid var(--link); /* Underline the active link */
+}

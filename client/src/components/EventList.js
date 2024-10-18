@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { format } from 'date-fns'; // Import format from date-fns
 
 
 const EventList = () => {
@@ -65,7 +66,7 @@ const EventList = () => {
                             <h3>
                                 <p><strong>{event.title}</strong></p>
                             </h3>
-                            <p><strong>Date:</strong> {event.date_of_event}</p>
+                            <p><strong>Date:</strong> {format(new Date(event.date_of_event), 'MMMM dd, yyyy')}</p>
                             <p><strong>Location:</strong> {event.location}</p>
                             {/* Link to Event Details page */}
                             <Link to={`/events/${event.id}`} className="rsvp-button">Book Now</Link>

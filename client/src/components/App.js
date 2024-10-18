@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import ProtectedRoute from "./RouteProtection";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
+import ProtectedRoute from "./RouteProtection"; // Custom route for protecting routes
 import EventList from "./EventList";
 import EventDetail from "./EventDetails";
 import Myevents from "./Myevents";
@@ -11,102 +11,87 @@ import Register from "./Register";
 import { UserProvider, useUserContext } from './UserContext'; // UserContext to manage global user state
 
 const App = () => {
-  const { user, isAdmin, fetchUserData } = useUserContext() || {};
-  const [userRsvps, setUserRsvps] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
+  const { user, isAdmin, fetchUserData } = useUserContext() || {}; // Destructure values from UserContext
+  const [userRsvps, setUserRsvps] = useState([]); // State to store user's RSVPs
+  const [loggedIn, setLoggedIn] = useState(false); // State to track if the user is logged in
 
   // Fetch RSVPs when the user is logged in
   useEffect(() => {
     if (user) {
-      fetchUserRsvps();
+      fetchUserRsvps(); // Call function to fetch RSVPs only if user is logged in
     }
-  }, [user]);
+  }, [user]); // Dependency array: Runs when user changes
 
   // Fetch user's RSVPs from the API
   const fetchUserRsvps = async () => {
-    const response = await fetch('/api/user_rsvps'); // Adjust API URL
+    const response = await fetch('`/events/${event.id}/rsvps`'); 
     const data = await response.json();
-    setUserRsvps(data);
+    setUserRsvps(data); // Set the fetched RSVPs to state
   };
 
-  // RSVP handler
+  // Function to handle RSVP action
   const handleRSVP = (event) => {
     const newRsvp = {
-      event,
-      status: "Attending",
-      participantName: user?.name,
-      participantId: user?.id,
+      event, // Event data
+      status: "Attending", // Mark status as "Attending"
+      participantName: user?.name, // Set user's name from context
+      participantId: user?.id, // Set user's ID from context
     };
-    setUserRsvps((prevRsvps) => [...prevRsvps, newRsvp]);
+    setUserRsvps((prevRsvps) => [...prevRsvps, newRsvp]); // Add new RSVP to the existing array
   };
 
-  // Cancel RSVP handler
+  // Function to handle canceling an RSVP
   const handleCancelRSVP = (eventId) => {
-    setUserRsvps((prevRsvps) => prevRsvps.filter((rsvp) => rsvp.event.id !== eventId));
+    setUserRsvps((prevRsvps) => prevRsvps.filter((rsvp) => rsvp.event.id !== eventId)); // Remove RSVP based on event ID
   };
 
-  // Handle login/logout/register button clicks
-  const handleLoginClick = () => {
-    setShowLogin(true);
-    setShowRegister(false);
-  };
-
-  const handleRegisterClick = () => {
-    setShowRegister(true);
-    setShowLogin(false);
-  };
-
+  // Function to handle logout
   const handleLogout = () => {
-    setLoggedIn(false);
+    setLoggedIn(false); // Set loggedIn state to false when user logs out
   };
 
   return (
-    <UserProvider>
+    <UserProvider> {/* Wrap the app with UserProvider to manage user state globally */}
       <Router>
         <NavBar 
-          loggedIn={loggedIn} 
-          onLoginClick={handleLoginClick} 
-          onRegisterClick={handleRegisterClick} 
-          onLogout={handleLogout} // Optional: Pass logout handler if needed
+          loggedIn={loggedIn} // Pass loggedIn state to NavBar for conditional rendering of buttons
+          onLogout={handleLogout} // Pass logout handler to NavBar
         />
 
         <div>
           <h1>Welcome to Motormingle</h1>
 
-          <Switch>
+          <Switch> {/* Switch to render only one route at a time */}
             {/* Home Page */}
             <Route path="/" exact>
-              <EventList />
+              <EventList /> {/* Event List component for listing all events */}
             </Route>
 
-            {/* Admin Login Page */}
-            <Route path="/admin">
-              <Login setLoggedIn={setLoggedIn} />
+            {/* Login Page */}
+            <Route path="/login">
+              <Login setLoggedIn={setLoggedIn} /> {/* Pass setLoggedIn function to Login for updating login state */}
+            </Route>
+
+            {/* Registration Page */}
+            <Route path="/register">
+              <Register setLoggedIn={setLoggedIn} /> {/* Pass setLoggedIn function to Register for updating login state */}
             </Route>
 
             {/* Event Detail Page */}
             <Route
-              path="/events/:id"
+              path="/events/:id" // :id is a dynamic parameter to fetch specific event details
               render={(props) => (
                 <EventDetail {...props} handleRSVP={handleRSVP} user={user} />
               )}
             />
 
             {/* My Events Page */}
-            <Route path="/myevents">
-              {userRsvps.length > 0 ? (
-                <Myevents userRsvps={userRsvps} handleCancelRSVP={handleCancelRSVP} />
-              ) : (
-                <p>No RSVPs found. Please RSVP to some events first.</p>
-              )}
-            </Route>
+            <ProtectedRoute path="/myevents" loggedIn={loggedIn}> {/* ProtectedRoute ensures only logged-in users can access this page */}
+              <Myevents userRsvps={userRsvps} handleCancelRSVP={handleCancelRSVP} /> {/* Pass user's RSVPs and cancel handler to MyEvents */}
+            </ProtectedRoute>
 
-            {/* Registration Page */}
-            <Route path="/register">
-              <Register setLoggedIn={setLoggedIn} />
-            </Route>
+            {/* Redirect to home for unknown routes */}
+            <Redirect to="/" /> {/* Redirect users to home if they try to access an unknown route */}
           </Switch>
         </div>
       </Router>

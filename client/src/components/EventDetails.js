@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 
 const EventDetail = () => {
-    const { id } = useParams();
+    const { id } = useParams(); // Get the event ID from the URL
     const [event, setEvent] = useState(null);
-    const [bookingConfirmation, setBookingConfirmation] = useState('');
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [participantName, setParticipantName] = useState('');
-    const [participantId, setParticipantId] = useState('');
-
-    const mockEventData = {
-        1: { title: 'Car Show 2024', description: 'A grand car show for all car enthusiasts.', date_of_event: '2024-10-21', time_of_event: '10:00 AM', location: 'Downtown', image_url: 'https://example.com/carshow.jpg', category: 'Classic Car Shows', average_rating: 4.5, total_tickets: 50, booked_tickets: 20 },
-        2: { title: 'Luxury Car Show', description: 'Explore the latest luxury vehicles.', date_of_event: '2024-11-05', time_of_event: '1:00 PM', location: 'City Park', image_url: 'https://example.com/luxurycarshow.webp', category: 'Luxury Car Shows', average_rating: 4.7, total_tickets: 50, booked_tickets: 40 },
-        3: { title: 'Vintage Auto Fair', description: 'Explore classic cars at the Vintage Auto Fair.', date_of_event: '2024-11-20', time_of_event: '9:00 AM', location: 'Fairgrounds', image_url: 'https://example.com/vintagefair.jpg', category: 'Vintage Car Shows', average_rating: 4.8, total_tickets: 50, booked_tickets: 10 },
-        4: { title: 'Custom and Modified Car Show', description: 'Showcasing the best in custom and modified vehicles.', date_of_event: '2024-12-10', time_of_event: '11:00 AM', location: 'Exhibition Center', image_url: 'https://example.com/customcarshow.jpg', category: 'Custom and Modified Car Shows', average_rating: 4.6, total_tickets: 50, booked_tickets: 25 },
-        5: { title: 'Electric Vehicle Show', description: 'Discover the future of driving with electric vehicles.', date_of_event: '2024-12-15', time_of_event: '10:00 AM', location: 'Tech Expo', image_url: 'https://example.com/electricvehicleshow.jpg', category: 'Electric Vehicle Shows', average_rating: 4.9, total_tickets: 50, booked_tickets: 35 },
-    };
+    const [userData, setUserData] = useState(null); // For actual user data
+    const [bookingConfirmation, setBookingConfirmation] = useState(''); // Stores the confirmation message after booking
+    const [error, setError] = useState(null); // Stores any errors that occur
+    const [loading, setLoading] = useState(true); // Loading state while fetching data
+    const [categories, setCategories] = useState([]); // Stores the categories fetched from the backend
+    const [selectedCategory, setSelectedCategory] = useState(''); // Selected category for the dropdown
+    const history = useHistory(); // To programmatically navigate to other pages
 
     useEffect(() => {
+        // Fetch event details
         const fetchEvent = async () => {
             try {
-                const eventData = mockEventData[id];
-                if (!eventData) throw new Error('Event not found');
+                const response = await fetch(`http://127.0.0.1:5555/events/${id}`); 
+                if (!response.ok) throw new Error('Event not found');
+                const eventData = await response.json();
                 setEvent(eventData);
             } catch (err) {
                 setError(err.message);
@@ -32,12 +28,39 @@ const EventDetail = () => {
             }
         };
 
+        // Fetch user data
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch(`http://127.0.0.1:5555/users`);
+                if (!response.ok) throw new Error('User not authenticated');
+                const userData = await response.json();
+                setUserData(userData);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
+
+        // Fetch categories
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5555/categories'); 
+                if (!response.ok) throw new Error('Categories not found');
+                const categoryData = await response.json();
+                setCategories(categoryData);
+            } catch (err) {
+                setError(err.message);
+            }
+        };
+
         fetchEvent();
+        fetchUserData();
+        fetchCategories();
     }, [id]);
 
+    // Handle RSVP booking
     const handleBooking = () => {
-        if (!participantName || !participantId) {
-            setError('Please provide participant name and ID.');
+        if (!userData) {
+            setError('User information is required for RSVP.');
             return;
         }
 
@@ -47,22 +70,29 @@ const EventDetail = () => {
             return;
         }
 
-        setBookingConfirmation(`Booking confirmed for ${participantName} (ID: ${participantId})`);
-        setParticipantName('');
-        setParticipantId('');
-        setError(null); // Reset error after successful booking
+        setBookingConfirmation(`RSVP confirmed for ${userData.name} (ID: ${userData.id}) in category ${selectedCategory}`);
+        setError(null);
+
+        setEvent(prevEvent => ({
+            ...prevEvent,
+            booked_tickets: prevEvent.booked_tickets + 1,
+        }));
+
+        // Redirect to "My Events" after successful RSVP
+        setTimeout(() => {
+            history.push('/myevents');
+        }, 4000);
     };
 
-    if (loading) return <div className="loading" aria-live="polite">Loading event details...</div>;
-    if (error) return <div className="error" aria-live="assertive">Error: {error}</div>;
+    if (loading) return <div className="loading">Loading event details...</div>;
+    if (error) return <div className="error">Error: {error}</div>;
 
     const remainingTickets = event.total_tickets - event.booked_tickets;
 
     return (
         <div className="event-detail">
             <h2>{event.title}</h2>
-            <img src={event.image_url} alt={event.title} className="event-image" loading="lazy" />
-            <p><strong>Category:</strong> {event.category}</p>
+            <img src={event.image_url} alt={event.title} className="event-image" />
             <p><strong>Location:</strong> {event.location}</p>
             <p><strong>Date:</strong> {format(new Date(event.date_of_event), 'MMMM dd, yyyy')}</p>
             <p><strong>Time:</strong> {event.time_of_event}</p>
@@ -74,27 +104,27 @@ const EventDetail = () => {
 
             {remainingTickets > 0 ? (
                 <>
-                    <h3>Book Your Ticket</h3>
-                    <input
-                        type="text"
-                        placeholder="Participant Name"
-                        value={participantName}
-                        onChange={(e) => setParticipantName(e.target.value)}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Participant ID"
-                        value={participantId}
-                        onChange={(e) => setParticipantId(e.target.value)}
-                    />
-                    <button onClick={handleBooking} className="booking-button">Book Now</button>
+                    <div>
+                        <label htmlFor="category-select"><strong>Select a Category:</strong></label>
+                        <select
+                            id="category-select"
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                        >
+                            <option value="">--Choose a category--</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.name}>{category.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <button onClick={handleBooking} className="booking-button">RSVP Now</button>
                     {bookingConfirmation && <p className="booking-confirmation">{bookingConfirmation}</p>}
                 </>
             ) : (
                 <p>Tickets Sold Out</p>
             )}
 
-            <Link to="/events" className="back-to-events">Back to Events</Link>
+            <Link to="/" className="back-to-events">Back to Events</Link>
         </div>
     );
 };

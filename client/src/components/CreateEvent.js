@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const CreateEvent = ({ onEventCreated }) => {
@@ -8,9 +8,27 @@ const CreateEvent = ({ onEventCreated }) => {
   const [description, setDescription] = useState("");
   const [category_id, setCategoryId] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Loading state
+  const [categories, setCategories] = useState([]); // State to hold categories
+  const [successMessage, setSuccessMessage] = useState(""); // Success message
 
-  const handleSubmit = (e) => {
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5555/categories"); // Adjust the API endpoint accordingly
+        setCategories(response.data);
+      } catch (error) {
+        setError("Failed to load categories.");
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading state
 
     const newEvent = {
       title,
@@ -20,25 +38,27 @@ const CreateEvent = ({ onEventCreated }) => {
       category_id,
     };
 
-    axios
-      .post("/admin/events", newEvent)
-      .then((response) => {
-        onEventCreated((prevEvents) => [...prevEvents, response.data]);
-        setTitle("");
-        setDateOfEvent("");
-        setLocation("");
-        setDescription("");
-        setCategoryId("");
-        setError("");
-      })
-      .catch((error) => {
-        setError("Failed to create event. Please check the fields.");
-      });
+    try {
+      const response = await axios.post("/admin/events", newEvent);
+      onEventCreated((prevEvents) => [...prevEvents, response.data]);
+      setTitle("");
+      setDateOfEvent("");
+      setLocation("");
+      setDescription("");
+      setCategoryId("");
+      setError("");
+      setSuccessMessage("Event created successfully!"); // Success message
+    } catch (error) {
+      setError("Failed to create event. Please check the fields.");
+    } finally {
+      setLoading(false); // Reset loading state
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      {error && <p>{error}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
 
       <div>
         <label>Title:</label>
@@ -79,15 +99,24 @@ const CreateEvent = ({ onEventCreated }) => {
       </div>
 
       <div>
-        <label>Category ID:</label>
-        <input
-          type="number"
+        <label>Category:</label>
+        <select
           value={category_id}
           onChange={(e) => setCategoryId(e.target.value)}
-        />
+          required
+        >
+          <option value="">Select a category</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <button type="submit">Create Event</button>
+      <button type="submit" disabled={loading}>
+        {loading ? "Creating..." : "Create Event"}
+      </button>
     </form>
   );
 };

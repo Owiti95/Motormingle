@@ -1,55 +1,50 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import carShowImage from '../assets/carshow.png'; 
-import luxuryCarShowImage from '../assets/luxurycarshow.webp';
-import vintageAutoFairImage from '../assets/vintagecars.webp';
-import customCarShowImage from '../assets/customcarshow.jpg';
-import electricVehicleShowImage from '../assets/electricvehicleshow.webp';
+
 
 const EventList = () => {
-    const [events, setEvents] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filteredEvents, setFilteredEvents] = useState([]);
+    const [events, setEvents] = useState([]); // Stores event data
+    const [loading, setLoading] = useState(true); // Tracks loading state
+    const [error, setError] = useState(null); // Handles any errors that occur
+    const [searchTerm, setSearchTerm] = useState(''); // Stores the user's search input
+    const [filteredEvents, setFilteredEvents] = useState([]); // Stores the filtered events based on the search
 
+    // Fetch events from the backend
     useEffect(() => {
         const fetchEvents = async () => {
-            setLoading(true);
+            setLoading(true); // Set loading to true while fetching data
             try {
-                // Updated mock events with ticket information
-                const mockEvents = [
-                    { id: 1, title: 'Car Show 2024', date_of_event: '2024-10-21', time_of_event: '10:00 AM', location: 'Downtown', image_url: carShowImage, category: 'Classic Car Shows', total_tickets: 50, booked_tickets: 20 },
-                    { id: 2, title: 'Luxury Car Show', date_of_event: '2024-11-05', time_of_event: '1:00 PM', location: 'City Park', image_url: luxuryCarShowImage, category: 'Luxury Car Shows', total_tickets: 50, booked_tickets: 50 },
-                    { id: 3, title: 'Vintage Auto Fair', date_of_event: '2024-11-20', time_of_event: '9:00 AM', location: 'Fairgrounds', image_url: vintageAutoFairImage, category: 'Vintage Car Shows', total_tickets: 50, booked_tickets: 10 },
-                    { id: 4, title: 'Custom and Modified Car Show', date_of_event: '2024-12-10', time_of_event: '11:00 AM', location: 'Exhibition Center', image_url: customCarShowImage, category: 'Custom and Modified Car Shows', total_tickets: 50, booked_tickets: 25 },
-                    { id: 5, title: 'Electric Vehicle Show', date_of_event: '2024-12-15', time_of_event: '10:00 AM', location: 'Tech Expo', image_url: electricVehicleShowImage, category: 'Electric Vehicle Shows', total_tickets: 50, booked_tickets: 50 },
-                ];
+                // Fetch events from your backend API
+                const response = await fetch('http://127.0.0.1:5555/events'); // Adjust the endpoint based on your backend route
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
 
-                setEvents(mockEvents);
-                setFilteredEvents(mockEvents);
+                const eventData = await response.json(); // Assuming the response is JSON
+                setEvents(eventData); // Set events with real data
+                setFilteredEvents(eventData); // Set filtered events for displaying
             } catch (err) {
-                setError(err.message);
+                setError(err.message); // Capture any errors during fetching
             } finally {
-                setLoading(false);
+                setLoading(false); // Stop loading after fetching is complete
             }
         };
 
-        fetchEvents();
+        fetchEvents(); // Fetch event data when the component mounts
     }, []);
 
+    // Handle search input by filtering events based on title or category
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
         const filtered = events.filter(event =>
             event.title.toLowerCase().includes(e.target.value.toLowerCase()) ||
-            event.category.toLowerCase().includes(e.target.value.toLowerCase())
+            (event.category && event.category.toLowerCase().includes(e.target.value.toLowerCase()))
         );
-        setFilteredEvents(filtered);
+        setFilteredEvents(filtered); // Update filtered events to show search results
     };
 
-    if (loading) return <div className="loading">Loading events...</div>;
-    if (error) return <div className="error">Error: {error}</div>;
+    if (loading) return <div className="loading">Loading events...</div>; // Display loading message while fetching
+    if (error) return <div className="error">Error: {error}</div>; // Display error if fetching fails
 
     return (
         <div>
@@ -63,20 +58,17 @@ const EventList = () => {
             />
             <div className="event-cards">
                 {filteredEvents.map(event => {
-                    const remainingTickets = event.total_tickets - event.booked_tickets;
                     return (
                         <div key={event.id} className="event-card">
+                            {/* Display event details */}
                             <img src={event.image_url} alt={event.title} className="event-image" />
                             <h3>
-                                <Link to={`/events/${event.id}`}>{event.title}</Link>
+                                <p><strong>{event.title}</strong></p>
                             </h3>
                             <p><strong>Date:</strong> {event.date_of_event}</p>
-                            <p><strong>Time:</strong> {event.time_of_event}</p>
-                            <p><strong>Total Tickets:</strong> {event.total_tickets}</p>
-                            <p><strong>Booked Tickets:</strong> {event.booked_tickets}</p>
-                            <p><strong>Available Tickets:</strong> {remainingTickets}</p>
-                            <p>{remainingTickets > 0 ? 'Tickets Available' : 'Tickets Sold Out'}</p>
-                            <Link to={`/booking/${event.id}`} className="booking-button">Book Now</Link>
+                            <p><strong>Location:</strong> {event.location}</p>
+                            {/* Link to Event Details page */}
+                            <Link to={`/events/${event.id}`} className="rsvp-button">Book Now</Link>
                         </div>
                     );
                 })}

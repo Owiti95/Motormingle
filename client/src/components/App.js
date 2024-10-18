@@ -1,82 +1,117 @@
-
-// import React, { useEffect, useState } from "react";
-// import { Switch, Route } from "react-router-dom";
-
-// function App() {
-//   return <h1>Project Client</h1>;
-// }
-
-// export default App;
-// import React from 'react';
-// import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-// // import SearchBar from './components/SearchBar';
-// import EventDetails from './EventDetails';
-// import EventList from './EventList';
-// // import Home from './pages/Home';
-// // import Events from './pages/Events';
-// // import './index.css';
-
-// const App = () => {
-//     return (
-//         <Router>
-//             {/* <Navbar /> */}
-//             <Switch>
-//                 {/* <Route path="/" exact component={Home} /> */}
-//                 <Route path="/events" component={EventList}/>
-//                 <Route path="/events/:id" component={EventDetails} />
-//                 {/* Add other routes here */}
-//             </Switch>
-//         </Router>
-//     );
-// };
-
-// export default App;
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-// import Navbar from './components/Navbar'; // Uncomment if you have a Navbar component
-import EventDetails from './EventDetails'; // Ensure the path is correct
-import EventList from './EventList'; // Ensure the path is correct
-import BookingDetails from './BookingDetails';
-// import './index.css'; // Ensure your CSS is imported if needed
-
-const App = () => {
-    return (
-        <Router>
-            {/* <Navbar /> */} {/* Uncomment if you have a Navbar */}
-            <Switch>
-                {/* <Route path="/" exact component={Home} /> */} {/* Uncomment for Home route */}
-                <Route path="/events" component={EventList} />
-                <Route path="/events/:id" component={EventDetails} />
-                <Route path="/booking/:id" component={BookingDetails} />
-            </Switch>
-        </Router>
-    );
-=======
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminDashboard from "./AdminDashboard";
-import Home from "./Home";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ProtectedRoute from "./RouteProtection";
+import EventList from "./EventList";
+import EventDetail from "./EventDetails";
+import Myevents from "./Myevents";
+import Login from "./Login";
+import LogoutButton from "./Logout";
+import NavBar from "./NavBar";
+import Register from "./Register";
+import { UserProvider, useUserContext } from './UserContext'; // UserContext to manage global user state
 
 const App = () => {
-  const is_admin = true; // Replace with actual admin check logic
+  const { user, isAdmin, fetchUserData } = useUserContext() || {};
+  const [userRsvps, setUserRsvps] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+
+  // Fetch RSVPs when the user is logged in
+  useEffect(() => {
+    if (user) {
+      fetchUserRsvps();
+    }
+  }, [user]);
+
+  // Fetch user's RSVPs from the API
+  const fetchUserRsvps = async () => {
+    const response = await fetch('/api/user_rsvps'); // Adjust API URL
+    const data = await response.json();
+    setUserRsvps(data);
+  };
+
+  // RSVP handler
+  const handleRSVP = (event) => {
+    const newRsvp = {
+      event,
+      status: "Attending",
+      participantName: user?.name,
+      participantId: user?.id,
+    };
+    setUserRsvps((prevRsvps) => [...prevRsvps, newRsvp]);
+  };
+
+  // Cancel RSVP handler
+  const handleCancelRSVP = (eventId) => {
+    setUserRsvps((prevRsvps) => prevRsvps.filter((rsvp) => rsvp.event.id !== eventId));
+  };
+
+  // Handle login/logout/register button clicks
+  const handleLoginClick = () => {
+    setShowLogin(true);
+    setShowRegister(false);
+  };
+
+  const handleRegisterClick = () => {
+    setShowRegister(true);
+    setShowLogin(false);
+  };
+
+  const handleLogout = () => {
+    setLoggedIn(false);
+  };
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute is_admin={is_admin}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
+    <UserProvider>
+      <Router>
+        <NavBar 
+          loggedIn={loggedIn} 
+          onLoginClick={handleLoginClick} 
+          onRegisterClick={handleRegisterClick} 
+          onLogout={handleLogout} // Optional: Pass logout handler if needed
         />
-      </Routes>
-    </Router>
-  );
 
+        <div>
+          <h1>Welcome to Motormingle</h1>
+
+          <Switch>
+            {/* Home Page */}
+            <Route path="/" exact>
+              <EventList />
+            </Route>
+
+            {/* Admin Login Page */}
+            <Route path="/admin">
+              <Login setLoggedIn={setLoggedIn} />
+            </Route>
+
+            {/* Event Detail Page */}
+            <Route
+              path="/events/:id"
+              render={(props) => (
+                <EventDetail {...props} handleRSVP={handleRSVP} user={user} />
+              )}
+            />
+
+            {/* My Events Page */}
+            <Route path="/myevents">
+              {userRsvps.length > 0 ? (
+                <Myevents userRsvps={userRsvps} handleCancelRSVP={handleCancelRSVP} />
+              ) : (
+                <p>No RSVPs found. Please RSVP to some events first.</p>
+              )}
+            </Route>
+
+            {/* Registration Page */}
+            <Route path="/register">
+              <Register setLoggedIn={setLoggedIn} />
+            </Route>
+          </Switch>
+        </div>
+      </Router>
+    </UserProvider>
+  );
 };
 
 export default App;

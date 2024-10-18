@@ -1,25 +1,24 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';//create navigational links that integrate with React Router
+import React from "react";
+import { NavLink } from "react-router-dom"; // create navigational links that integrate with React Router
 
 function NavBar() {
   return (
     <nav className="navbar">
-        <NavLink to="/admin" className="nav-link" >
+      <NavLink to="/admin" className="nav-link" activeClassName="active">
         ADMIN
       </NavLink>
-      <NavLink to="/signup/login" className="nav-link">
-        SIGNUP/LOGIN
+      <NavLink to="/register" className="nav-link" activeClassName="active">
+        SIGN UP
       </NavLink>
-      <NavLink to="/home" className="nav-link" >
+      <NavLink to="/login" className="nav-link" activeClassName="active">
+        LOGIN
+      </NavLink>
+      <NavLink to="/" className="nav-link" exact activeClassName="active">
         HOME
       </NavLink>
-      <NavLink to="/eventlist" className="nav-link" >
-        EVENTS
+      <NavLink to="/myevents" className="nav-link" activeClassName="active">
+        MY EVENTS
       </NavLink>
-      <NavLink to="/my_events" className="nav-link" >
-        My Events
-      </NavLink>
-      
     </nav>
   );
 }

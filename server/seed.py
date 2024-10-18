@@ -1,36 +1,21 @@
 from config import db
 from app import app
 from models import User, Event, RSVP, Category
-from datetime import datetime
+from datetime import datetime, time
 from flask_bcrypt import Bcrypt
 
-from faker import Faker  
-# Instantiate Faker
-fake = Faker()
-=======
-
-
+# Initialize Bcrypt for password hashing
 bcrypt = Bcrypt()
 
 print("Starting seed...")
 
+# Use the application context to access the database
 with app.app_context():
+    # Drop all existing tables and create new ones
     db.drop_all()
     db.create_all()
     print("Created all tables.")
 
-
-    # Create users
-    try:
-        users = []
-        for _ in range(5):  # Create 5 random users
-            user = User(
-                name=fake.name(),
-                email=fake.email(),
-                password_hash=bcrypt.generate_password_hash("password").decode('utf-8')
-            )
-            users.append(user)
-=======
     # Create users manually
     try:
         users = [
@@ -40,57 +25,81 @@ with app.app_context():
             User(name="Elsie", email="elsie@example.com", password_hash=bcrypt.generate_password_hash("password").decode('utf-8')),
             User(name="Baimet", email="baimet@example.com", password_hash=bcrypt.generate_password_hash("password").decode('utf-8')),
             User(name="AdminUser", email="adminuser@example.com", password_hash=bcrypt.generate_password_hash("password").decode('utf-8'), is_admin=True),
-    ]
+        ]
         
-
+        # Add all users to the session and commit
         db.session.add_all(users)
         db.session.commit()
         print("Users added successfully.")
     except Exception as e:
         print(f"Error creating users: {e}")
 
-
-    # Create events without category_id
-    try:
-        events = []
-        for _ in range(5):  # Create 5 random events
-            event = Event(
-                title=fake.catch_phrase(),
-                description=fake.text(),
-                date_of_event=fake.future_datetime(end_date="+30d"),
-                location=fake.city(),
-                user_id=fake.random_element(elements=[1, 2, 3, 4, 5])  # Associate with random user
-            )
-            events.append(event)
-=======
     # Create events manually
     try:
         events = [
-            Event(title="Formula 1 Tournament", description="join fellow motorsport enthusiasts for an experience of Formula 1 excitement simulation", date_of_event=datetime(2024, 11, 1), location="Gamers Arcade", user_id=1),
-            Event(title="Off road", description="An off-road adventure with 4x4 vehicles", date_of_event=datetime(2024, 11, 15), location="Lodwar", user_id=2),
-            Event(title="Car Auction", description="Get the best deals", date_of_event=datetime(2024, 12, 10), location="Nairobi", user_id=3),
-            Event(title="Expo", description="Explore and discover", date_of_event=datetime(2024, 12, 5), location="Nairobi", user_id=4),
-            Event(title="Tournament", description="Top drivers compete", date_of_event=datetime(2024, 12, 20), location="Kisumu", user_id=5),
+            Event(
+                title="Formula 1 Tournament",
+                description="Join fellow motorsport enthusiasts for an experience of Formula 1 excitement simulation",
+                date_of_event=datetime(2024, 11, 1),
+                time=time(19, 0),  # New time added
+                location="Gamers Arcade",
+                available_tickets=100,
+                booked_tickets=98,
+                user_id=1
+            ),
+            Event(
+                title="Off Road Adventure",
+                description="An off-road adventure with 4x4 vehicles",
+                date_of_event=datetime(2024, 11, 15),
+                time=time(10, 30),  # New time added
+                location="Lodwar",
+                available_tickets=50,
+                booked_tickets=7,
+                user_id=2
+            ),
+            Event(
+                title="Car Auction",
+                description="Get the best deals",
+                date_of_event=datetime(2024, 12, 10),
+                time=time(16, 0),  # New time added
+                location="Nairobi",
+                available_tickets=200,
+                booked_tickets=130,
+                user_id=3
+            ),
+            Event(
+                title="Expo",
+                description="Explore and discover",
+                date_of_event=datetime(2024, 12, 5),
+                time=time(12, 0),  # New time added
+                location="Nairobi",
+                available_tickets=75,
+                booked_tickets=15,
+                user_id=4
+            ),
+            Event(
+                title="Tournament",
+                description="Top drivers compete",
+                date_of_event=datetime(2024, 12, 20),
+                time=time(9, 0),  # New time added
+                location="Kisumu",
+                available_tickets=30,
+                booked_tickets=4,
+                user_id=5
+            ),
         ]
-
-        db.session.add_all(events)
+        
+        # Add events to the session and print formatted time
+        for event in events:
+            db.session.add(event)
+            print(f"Added event: {event.title}, Time: {event.time.strftime('%H:%M')}")  # Print formatted time
+        
+        # Commit events to the database
         db.session.commit()
         print("Events added successfully.")
     except Exception as e:
         print(f"Error creating events: {e}")
 
-
-    # Create RSVPs
-    try:
-        rsvps = []
-        for _ in range(5):  # Create 5 random RSVPs
-            rsvp = RSVP(
-                status=fake.random_element(elements=["Attending", "Not Attending"]),
-                user_id=fake.random_element(elements=[1, 2, 3, 4, 5]),  # Associate with random user
-                event_id=fake.random_element(elements=[1, 2, 3, 4, 5])  # Associate with random event
-            )
-            rsvps.append(rsvp)
-=======
     # Create RSVPs manually
     try:
         rsvps = [
@@ -100,33 +109,25 @@ with app.app_context():
             RSVP(status="Attending", user_id=4, event_id=4),
             RSVP(status="Not Attending", user_id=5, event_id=5),
         ]
-
+        
+        # Add RSVPs to the session and commit
         db.session.add_all(rsvps)
         db.session.commit()
         print("RSVPs added successfully.")
     except Exception as e:
         print(f"Error creating RSVPs: {e}")
 
-
-    # Create categories without event_id
-    try:
-        categories = []
-        for _ in range(5):  # Create 5 random categories
-            category = Category(
-                name=fake.word().capitalize()
-            )
-            categories.append(category)
-
     # Create categories manually
     try:
         categories = [
             Category(name="Competition"),
-            Category(name="sales"),
-            Category(name="show"),
-            Category(name="experience"),
+            Category(name="Sales"),
+            Category(name="Show"),
+            Category(name="Experience"),
             Category(name="Gaming"),
         ]
-
+        
+        # Add categories to the session and commit
         db.session.add_all(categories)
         db.session.commit()
         print("Categories added successfully.")
@@ -135,12 +136,6 @@ with app.app_context():
 
     # Associate events and categories
     try:
-
-        for i in range(1, 6):
-            event = Event.query.get(i)
-            category = Category.query.get(fake.random_int(min=1, max=5))
-            event.categories.append(category)
-=======
         event_category_associations = [
             (1, 5),
             (2, 4),
@@ -149,19 +144,17 @@ with app.app_context():
             (5, 1),
         ]
 
+        # Loop through associations and append categories to events
         for event_id, category_id in event_category_associations:
-            event = Event.query.get(event_id)
-            category = Category.query.get(category_id)
-            event.categories.append(category)
+            event = db.session.get(Event, event_id)  # Use session.get instead of Event.query.get
+            category = db.session.get(Category, category_id)
+            if event and category:
+                event.categories.append(category)  # Add category to event
 
-
+        # Commit associations to the database
         db.session.commit()
         print("Events and categories associated successfully.")
     except Exception as e:
         print(f"Error associating events and categories: {e}")
 
-
 print("Seeded the database successfully.")
-=======
-print("Seeded the database successfully.")
-

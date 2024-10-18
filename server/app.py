@@ -78,7 +78,15 @@ class EventList(Resource):
         # Use limited serialization to avoid circular references
         return [event.to_dict(rules=('-rsvps.event', '-categories.events')) for event in events], 200
 
-
+class EventDetail(Resource):
+    def get(self, event_id):
+        event = Event.query.get(event_id)
+        if not event:
+            return {"error": "Event not found"}, 404
+        
+        # Serialize the event data, you can customize this depending on your model
+        return event.to_dict(rules=('-rsvps.event', '-categories.events')), 200
+    
 # RSVP resource
 class RSVPList(Resource):
     def post(self, event_id):
@@ -99,6 +107,32 @@ class RSVPList(Resource):
 
         db.session.commit()
         return rsvp.to_dict(), 201
+    
+    # GET: Retrieve the user's RSVP for the event
+    def get(self, event_id):
+        user_id = session.get('user_id')  # Get the current user's ID from the session
+
+        if not user_id:
+            return {"error": "Unauthorized"}, 401  # Return 401 if the user is not logged in
+
+        # Check if the user has RSVP'd to this event
+        rsvp = RSVP.query.filter_by(user_id=user_id, event_id=event_id).first()
+
+        if rsvp:
+            # If the RSVP exists, return it in JSON format
+            return rsvp.to_dict(), 200
+        else:
+            # If the RSVP does not exist, return a message indicating so
+            return {"message": "No RSVP found for this event"}, 404
+class UserList(Resource):
+    def get(self):
+        users =User.query.all()
+        return [user.to_dict() for user in users], 200
+
+class CategoryList(Resource):
+    def get(self):
+        categories = Category.query.all()
+        return [category.to_dict() for category in categories], 200
 
 # Admin dashboard for event management
 class AdminDashboard(Resource):
@@ -199,6 +233,9 @@ api.add_resource(Register, '/register')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 api.add_resource(EventList, '/events')
+api.add_resource(EventDetail,'/events/<int:event_id>')
+api.add_resource(CategoryList, '/categories')
+api.add_resource(UserList,'/users')
 api.add_resource(RSVPList, '/events/<int:event_id>/rsvps')
 
 # Admin routes

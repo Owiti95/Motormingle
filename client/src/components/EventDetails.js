@@ -14,6 +14,13 @@ const EventDetail = () => {
     const history = useHistory(); // Hook for programmatic navigation
 
     useEffect(() => {
+        if (!userData) {
+            history.push('/login'); // Redirect to login if no user data
+        }
+    }, [userData, history]);
+    
+    
+    useEffect(() => {
         // Fetch event details
         const fetchEvent = async () => {
             try {
@@ -97,7 +104,7 @@ const EventDetail = () => {
 
             // Redirect to "My Events" after successful RSVP
             setTimeout(() => {
-                history.push('/myevents');
+                history.push('/Myevents');
             }, 4000);
         } catch (err) {
             setError(err.message); // Set error message if RSVP fails

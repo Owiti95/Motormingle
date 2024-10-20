@@ -86,12 +86,10 @@ const App = () => {
             />
 
             {/* My Events Page */}
-            <ProtectedRoute path="/myevents" loggedIn={loggedIn}> {/* ProtectedRoute ensures only logged-in users can access this page */}
+            <ProtectedRoute path="/Myevents" loggedIn={loggedIn}> {/* ProtectedRoute ensures only logged-in users can access this page */}
               <Myevents userRsvps={userRsvps} handleCancelRSVP={handleCancelRSVP} /> {/* Pass user's RSVPs and cancel handler to MyEvents */}
             </ProtectedRoute>
 
-            {/* Redirect to home for unknown routes */}
-            <Redirect to="/" /> {/* Redirect users to home if they try to access an unknown route */}
           </Switch>
         </div>
       </Router>

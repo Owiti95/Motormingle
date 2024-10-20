@@ -16,7 +16,7 @@ function NavBar() {
       <NavLink to="/" className="nav-link" exact activeClassName="active">
         HOME
       </NavLink>
-      <NavLink to="/myevents" className="nav-link" activeClassName="active">
+      <NavLink to="/Myevents" className="nav-link" activeClassName="active">
         MY EVENTS
       </NavLink>
     </nav>

@@ -124,6 +124,22 @@ class RSVPList(Resource):
         else:
             # If the RSVP does not exist, return a message indicating so
             return {"message": "No RSVP found for this event"}, 404
+        
+    def delete(self, event_id):
+        user_id = session.get('user_id')  # Get the user ID from the session
+
+        if not user_id:
+            return {"error": "Unauthorized"}, 401
+
+        # Find the RSVP entry for this user and event
+        rsvp = RSVP.query.filter_by(user_id=user_id, event_id=event_id).first()
+
+        if rsvp:
+            db.session.delete(rsvp)
+            db.session.commit()
+            return {"message": "RSVP canceled successfully"}, 200
+        else:
+            return {"error": "RSVP not found"}, 404
 class UserList(Resource):
     def get(self):
         users =User.query.all()

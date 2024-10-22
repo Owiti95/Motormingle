@@ -1,22 +1,22 @@
+// src/components/SearchBar.js
 import React, { useState } from "react";
 
-const SearchBar = ({ onSearch }) => {
-  const [query, setQuery] = useState("");
+const SearchBar = () => {
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = (e) => {
-    setQuery(e.target.value);
-    onSearch(e.target.value);
+    setSearchTerm(e.target.value);
+    // Implement filtering logic based on searchTerm
   };
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search for events by title or location"
-        value={query}
-        onChange={handleSearch}
-      />
-    </div>
+    <input
+      type="text"
+      placeholder="Search for events..."
+      value={searchTerm}
+      onChange={handleSearch}
+      className="search-bar"
+    />
   );
 };
 

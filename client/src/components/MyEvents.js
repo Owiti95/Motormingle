@@ -1,51 +1,56 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
+import "../index.css"; // Custom CSS for this page
 
-function MyEvents({ userRsvps, handleCancelRSVP }) {
-  const [myEvents, setMyEvents] = useState([]);
+const MyEvents = () => {
+  const [rsvps, setRsvps] = useState([]);
+  const [error, setError] = useState("");
+  const history = useHistory();
 
   useEffect(() => {
-    const attendingEvents = userRsvps.filter(
-      (rsvp) => rsvp.status === "Attending"
-    );
-    setMyEvents(attendingEvents);
-  }, [userRsvps]);
+    const fetchRsvps = async () => {
+      const token = sessionStorage.getItem("token"); // Assuming you're using token-based auth
 
-  const handleCancelClick = (event) => {
-    fetch(`/rsvp/${event.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: 1 }),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        handleCancelRSVP(event); // Update parent state to reflect cancellation
-      })
-      .catch((error) => console.error("Error canceling RSVP:", error));
-  };
+      try {
+        const response = await axios.get("/events/my-rsvps", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setRsvps(response.data);
+      } catch (err) {
+        setError("Failed to load RSVPs.");
+      }
+    };
+
+    fetchRsvps();
+  }, []);
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  if (!rsvps.length) {
+    return <p>No RSVPs found.</p>;
+  }
 
   return (
-    <div className="event-collection">
-      <h2>My Events</h2>
-      {myEvents.length > 0 ? (
-        myEvents.map((rsvp) => (
-          <div key={rsvp.event.id} className="event-profile">
-            <img src={rsvp.event.imageUrl} width="200" alt={rsvp.event.name} />
-            <p>{rsvp.event.title}</p>
-            <p>{rsvp.event.description}</p>
-            <p>{rsvp.event.date_of_event}</p>
-            <p>{rsvp.event.location}</p>
-            <button onClick={() => handleCancelClick(rsvp.event)}>
-              Cancel RSVP
-            </button>
-          </div>
-        ))
-      ) : (
-        <p>You haven't RSVPed to any events yet.</p>
-      )}
+    <div className="my-events">
+      <h1>My Events</h1>
+      <ul>
+        {rsvps.map((rsvp) => (
+          <li key={rsvp.event_id}>
+            <h2>{rsvp.event.title}</h2>
+            <p>
+              Date: {new Date(rsvp.event.date_of_event).toLocaleDateString()}
+            </p>
+            <p>Status: {rsvp.status}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
 
 export default MyEvents;

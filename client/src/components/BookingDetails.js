@@ -11,40 +11,14 @@ const BookingDetail = () => {
   const [participantName, setParticipantName] = useState("");
   const [participantId, setParticipantId] = useState("");
 
-  // Mock event data to simulate API call
-  const mockEventData = {
-    1: {
-      title: "Car Show 2024",
-      date_of_event: "2024-10-21",
-      time_of_event: "10:00 AM",
-      location: "Downtown",
-      total_tickets: 50,
-      booked_tickets: 20,
-    },
-    2: {
-      title: "Luxury Car Show",
-      date_of_event: "2024-11-05",
-      time_of_event: "1:00 PM",
-      location: "City Park",
-      total_tickets: 50,
-      booked_tickets: 50,
-    },
-    3: {
-      title: "Vintage Auto Fair",
-      date_of_event: "2024-11-20",
-      time_of_event: "9:00 AM",
-      location: "Fairgrounds",
-      total_tickets: 50,
-      booked_tickets: 10,
-    },
-    // Add more events as needed
-  };
-
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const eventData = mockEventData[id];
-        if (!eventData) throw new Error("Event not found");
+        const response = await fetch(`http://localhost:5555/events/${id}`);
+        if (!response.ok) {
+          throw new Error("Event not found");
+        }
+        const eventData = await response.json();
         setEvent(eventData);
       } catch (err) {
         setError(err.message);

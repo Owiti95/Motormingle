@@ -1,32 +1,29 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import EventDetail from "./EventDetails";
 import EventList from "./EventList";
-import BookingDetails from "./BookingDetails";
-import AdminDashboard from "./AdminDashboard";
-import ProtectedRoute from "./RouteProtection";
+import EventDetail from "./EventDetails"; // Import the EventDetail component
 import Login from "./Login";
 import Register from "./Register";
+import AdminDashboard from "./AdminDashboard";
 import { UserProvider } from "./UserContext";
+import NavBar from "./NavBar";
+import ProtectedRoute from "./RouteProtection";
+import EditEvent from "./EditEvent";
+import MyEvents from "./MyEvents";
 
 const App = () => {
-  const isAdmin = true; // Replace with actual admin check logic
-
   return (
     <UserProvider>
       <Router>
+        <NavBar />
         <Switch>
-          <Route path="/events/:id" component={EventDetail} />
+          <Route path="/" exact component={EventList} />
+          <Route path="/events/:id" component={EventDetail} />{" "}
           <Route path="/login" component={Login} />
+          <Route path="/admin/dashboard/event/:id/edit" component={EditEvent} />
           <Route path="/register" component={Register} />
-          <Route path="/events" component={EventList} />
-          <Route path="/booking/:id" component={BookingDetails} />
-          <ProtectedRoute
-            path="/admin"
-            component={AdminDashboard}
-            isAdmin={isAdmin}
-          />
-          <Route path="/" component={EventList} />
+          <Route path="/my-events" component={MyEvents} />
+          <ProtectedRoute path="/admin" component={AdminDashboard} />
         </Switch>
       </Router>
     </UserProvider>

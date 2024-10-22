@@ -1,7 +1,6 @@
 from sqlalchemy.ext.associationproxy import association_proxy  # Helps create a proxy to simplify many-to-many relationships
 from sqlalchemy.orm import validates  # Provides validation hooks for model attributes
 from config import db
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, Table  # MetaData for schema definition & table for defining association tables
 from sqlalchemy_serializer import SerializerMixin
 from flask_bcrypt import Bcrypt
@@ -25,6 +24,7 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String, unique=True, nullable=False)
     password_hash = db.Column(db.String, nullable=False)  # password hash for secure storagerequired
     is_admin = db.Column(db.Boolean, default=False)  # Boolean field to check if the user is an admin
+    
     
    
     # one user can have multiple RSVPs (One-to-Many relationship)
@@ -74,9 +74,11 @@ class Event(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    date_of_event = db.Column(db.DateTime, nullable=False)
+    date_of_event = db.Column(db.String, nullable=False)
     location = db.Column(db.String, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # foreign key linking to the user who created the event
+    image_url = db.Column(db.String)  # Add image URL field
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
 
     # one event can have multiple RSVPs (one-to-many relationship)
     rsvps = db.relationship('RSVP', back_populates='event')  # Connects Event with RSVP

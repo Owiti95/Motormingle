@@ -1,113 +1,82 @@
-import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { Link } from "react-router-dom";
+import { UserContext } from './UserContext'; // Import UserContext
 
-function MyEvents({ userId, handleCancelRSVP }) {
-    const [myEvents, setMyEvents] = useState([]); // Store attending events
-    const [error, setError] = useState(null); // For error messages
-    const [successMessage, setSuccessMessage] = useState(''); // Success message
-    const [loading, setLoading] = useState(false); // Loading state
-    const history = useHistory();
+const MyEvents = () => {
+    const [myEvents, setMyEvents] = useState([]);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
+    const { currentUser } = useContext(UserContext); // Get current user from context
 
-    // Ensure user is logged in, if not redirect to login
+    // Fetch RSVPed events on component mount
     useEffect(() => {
-        if (!userId) {
-            history.push('/login'); // Redirect to login if no user is logged in
-        }
-    }, [userId, history]);
-
-    // Fetch user's RSVPs when the component loads
-    useEffect(() => {
-        const fetchUserRsvps = async () => {
-            setLoading(true); // Start loading
-
+        const fetchMyEvents = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5555/users/${userId}/rsvps`);
-                if (!response.ok) throw new Error('Failed to fetch RSVPs');
-                
+                const response = await fetch('/events/my-rsvps', {
+                    credentials: "include", // Ensure cookies are sent with the request
+                });
+                if (!response.ok) throw new Error("Failed to fetch my events.");
                 const data = await response.json();
-                setMyEvents(data); // Set the RSVPs as events
-                setError(null); // Clear any errors
-            } catch (error) {
-                setError(error.message); // Set error message
+                setMyEvents(data);
+            } catch (err) {
+                setError(err.message);
             } finally {
-                setLoading(false); // Stop loading
+                setLoading(false);
             }
         };
 
-        fetchUserRsvps();
-    }, [userId]);
+        fetchMyEvents();
+    }, []);
 
-    // Handle canceling an RSVP
-    const handleCancelClick = (event) => {
-        if (!event.id) {
-            console.error("Event ID is missing");
-            return;
-        }
+    // Handle canceling RSVP
+    const handleCancelRSVP = async (eventId) => {
+        try {
+            const response = await fetch(`/events/${eventId}/rsvps`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
 
-        setLoading(true); // Start loading
-        fetch(`http://127.0.0.1:5555/events/${event.id}/rsvps`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ userId, eventId: event.id }), // Include userId in request body
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Failed to cancel RSVP');
+            if (response.ok) {
+                // Remove canceled event from state
+                setMyEvents((prevEvents) => prevEvents.filter(event => event.id !== eventId));
+                alert('RSVP canceled successfully');
+            } else {
+                const errorData = await response.json();
+                alert(`Error: ${errorData.error}`);
             }
-            return response.json(); // Parse response
-        })
-        .then(() => {
-            handleCancelRSVP(event); // Update parent state
-            setSuccessMessage(`RSVP canceled for ${event.title}`); // Set success message
-            setError(null); // Clear errors
-        })
-        .catch((error) => {
-            setError(error.message); // Set error message
-            setSuccessMessage(''); // Clear success message on error
-        })
-        .finally(() => {
-            setLoading(false); // Stop loading
-        });
+        } catch (error) {
+            console.error('Failed to cancel RSVP', error);
+            alert('Failed to cancel RSVP');
+        }
     };
 
-    // Optional: Clear success message after 3 seconds
-    useEffect(() => {
-        if (successMessage) {
-            const timer = setTimeout(() => {
-                setSuccessMessage(''); // Clear success message after 3 seconds
-            }, 3000);
-            return () => clearTimeout(timer); // Cleanup timer on unmount
-        }
-    }, [successMessage]);
+    // Show loading or error messages if applicable
+    if (loading) return <div className="loading">Loading your events...</div>;
+    if (error) return <div className="error">Error: {error}</div>;
 
     return (
-        <div className="event-collection">
-            <h2>My Events</h2>
-            {error && <div className="error-message" role="alert">{error}</div>}
-            {successMessage && <div className="success-message" role="alert">{successMessage}</div>}
-
-            {loading && <p>Loading...</p>} {/* Loading state message */}
-
-            {myEvents.length > 0 ? (
-                myEvents.map((rsvp) => (
-                    <div key={rsvp.event.id} className="event-profile">
-                        <img src={rsvp.event.imageUrl} width="200" alt={rsvp.event.title} />
-                        <p><strong>{rsvp.event.title}</strong></p>
-                        <p>{rsvp.event.description}</p>
-                        <p><strong>Date:</strong> {rsvp.event.date_of_event}</p>
-                        <p><strong>Location:</strong> {rsvp.event.location}</p>
-                        <button onClick={() => handleCancelClick(rsvp.event)}>
+        <div className="my-events">
+            <h1>Your RSVPed Events</h1>
+            {myEvents.length === 0 ? (
+                <p>You have not RSVPed to any events.</p>
+            ) : (
+                myEvents.map((event) => (
+                    <div key={event.id} className="event-card">
+                        <h2>{event.title}</h2>
+                        <p>Date: {new Date(event.date_of_event).toLocaleDateString()}</p>
+                        <p>Location: {event.location}</p>
+                        <button onClick={() => handleCancelRSVP(event.id)} className="cancel-rsvp-button">
                             Cancel RSVP
                         </button>
                     </div>
                 ))
-            ) : (
-                <p>You haven't RSVPed to any events yet.</p>
             )}
+            <Link to="/" className="back-to-events">Back to Events</Link>
         </div>
     );
-}
+};
 
 export default MyEvents;

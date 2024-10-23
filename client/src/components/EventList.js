@@ -1,81 +1,118 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { format } from 'date-fns'; // Import format from date-fns
-
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Link, useLocation } from "react-router-dom";
+import "../index.css"; // Import the updated CSS file
 
 const EventList = () => {
-    const [events, setEvents] = useState([]); // Stores event data
-    const [loading, setLoading] = useState(true); // Tracks loading state
-    const [error, setError] = useState(null); // Handles any errors that occur
-    const [searchTerm, setSearchTerm] = useState(''); // Stores the user's search input
-    const [filteredEvents, setFilteredEvents] = useState([]); // Stores the filtered events based on the search
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]); // State to handle filtered events
+  const [searchQuery, setSearchQuery] = useState(""); // State for the search input
+  const [error, setError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false); // State to check if user is admin
+  const location = useLocation(); // Get the current location
 
-    // Fetch events from the backend
-    useEffect(() => {
-        const fetchEvents = async () => {
-            setLoading(true); // Set loading to true while fetching data
-            try {
-                // Fetch events from your backend API
-                const response = await fetch('http://127.0.0.1:5555/events'); // Adjust the endpoint based on your backend route
-                if (!response.ok) {
-                    throw new Error('Failed to fetch events');
-                }
-
-                const eventData = await response.json(); // Assuming the response is JSON
-                setEvents(eventData); // Set events with real data
-                setFilteredEvents(eventData); // Set filtered events for displaying
-            } catch (err) {
-                setError(err.message); // Capture any errors during fetching
-            } finally {
-                setLoading(false); // Stop loading after fetching is complete
-            }
-        };
-
-        fetchEvents(); // Fetch event data when the component mounts
-    }, []);
-
-    // Handle search input by filtering events based on title or category
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-        const filtered = events.filter(event =>
-            event.title.toLowerCase().includes(e.target.value.toLowerCase()) ||
-            (event.category && event.category.toLowerCase().includes(e.target.value.toLowerCase()))
-        );
-        setFilteredEvents(filtered); // Update filtered events to show search results
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get("/events");
+        setEvents(response.data);
+        setFilteredEvents(response.data); // Initialize filtered events with all events
+      } catch (err) {
+        setError("Failed to load events.");
+      }
     };
 
-    if (loading) return <div className="loading">Loading events...</div>; // Display loading message while fetching
-    if (error) return <div className="error">Error: {error}</div>; // Display error if fetching fails
+    const checkAdminStatus = async () => {
+      try {
+        const response = await axios.get("/check-admin-status"); // Hypothetical endpoint
+        setIsAdmin(response.data.isAdmin); // Assuming the API returns { isAdmin: true/false }
+      } catch (err) {
+        console.error("Error checking admin status:", err);
+      }
+    };
 
-    return (
-        <div>
-            <h2>Event List</h2>
-            <input
-                type="text"
-                placeholder="Search by name or category"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="search-bar"
-            />
-            <div className="event-cards">
-                {filteredEvents.map(event => {
-                    return (
-                        <div key={event.id} className="event-card">
-                            {/* Display event details */}
-                            <img src={event.image_url} alt={event.title} className="event-image" />
-                            <h3>
-                                <p><strong>{event.title}</strong></p>
-                            </h3>
-                            <p><strong>Date:</strong> {format(new Date(event.date_of_event), 'MMMM dd, yyyy')}</p>
-                            <p><strong>Location:</strong> {event.location}</p>
-                            {/* Link to Event Details page */}
-                            <Link to={`/events/${event.id}`} className="rsvp-button">Book Now</Link>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
+    fetchEvents();
+    checkAdminStatus();
+  }, []);
+
+  // Function to delete an event
+  const deleteEvent = async (eventId) => {
+    try {
+      await axios.delete(`/admin/dashboard/event/${eventId}`); // API call to delete the event
+      setEvents(events.filter((event) => event.id !== eventId)); // Update the state to remove the deleted event
+      setFilteredEvents(filteredEvents.filter((event) => event.id !== eventId)); // Update filtered events as well
+    } catch (err) {
+      setError("Failed to delete event.");
+    }
+  };
+
+  // Function to handle the search input change for title OR location
+  const handleSearch = () => {
+    const filtered = events.filter(
+      (event) =>
+        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchQuery.toLowerCase())
     );
+    setFilteredEvents(filtered);
+  };
+
+  return (
+    <div className="event-list">
+      {error && <p>{error}</p>}
+      <h1>Motormingle</h1>
+
+      {/* Single Search bar */}
+      <div className="search-form">
+        <input
+          type="text"
+          placeholder="Search by title or location"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
+
+      <div className="event-cards-container">
+        {filteredEvents.map((event) => (
+          <div className="event-card" key={event.id}>
+            {event.image_url && (
+              <img
+                src={event.image_url}
+                alt={event.title}
+                className="event-image"
+              />
+            )}
+            <h2 className="event-title">{event.title}</h2>
+            <p className="event-location">Location: {event.location}</p>
+            <p className="event-date">
+              Date: {new Date(event.date_of_event).toLocaleDateString()}
+            </p>
+            <div className="event-buttons">
+              {isAdmin && location.pathname !== "/" && ( // Check if the current path is not the root page
+                <>
+                  <Link
+                    to={`/admin/dashboard/event/${event.id}/edit`}
+                    className="edit-button"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => deleteEvent(event.id)}
+                    className="delete-button"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
+              <Link to={`/events/${event.id}`} className="book-now-button">
+                View Details
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default EventList;

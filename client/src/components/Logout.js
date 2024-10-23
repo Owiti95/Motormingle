@@ -1,23 +1,23 @@
-import React from 'react';
+import React, { useContext } from "react";
+import { useHistory } from "react-router-dom";
+import { UserContext } from "./UserContext";
+import axios from "axios";
 
-const LogoutButton = ({ onLogout }) => {
+const Logout = () => {
+  const { setUser } = useContext(UserContext);
+  const history = useHistory();
+
   const handleLogout = async () => {
     try {
-      const response = await fetch('/logout', {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        onLogout();  // Update the parent state to reflect the logged-out status
-      } else {
-        console.log('Logout failed.');
-      }
+      await axios.post("/logout"); // Make sure you implement this in your backend
+      setUser(null); // Clear user in context
+      history.push("/login"); // Redirect to login after logout
     } catch (err) {
-      console.log('An error occurred during logout.');
+      console.error("Logout failed:", err);
     }
   };
 
   return <button onClick={handleLogout}>Logout</button>;
 };
 
-export default LogoutButton;
+export default Logout;

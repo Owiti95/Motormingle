@@ -1,64 +1,93 @@
-// AdminDashboard.js
-// AdminDashboard.js
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import EventList from "./EventList";
+import EventList from "./EventList"; // Assuming you have EventList component for listing events
 import CreateEvent from "./CreateEvent";
 
 const AdminDashboard = () => {
   const [events, setEvents] = useState([]);
-  const [attendees, setAttendees] = useState([]);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true); // Loading state
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    description: "",
+    date: "",
+    location: "",
+    ticket_available: 0,
+  });
 
   useEffect(() => {
-    // Fetch events and attendees for the admin dashboard
-    const fetchData = async () => {
+    const fetchEvents = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5555/admin/dashboard");
-        setEvents(response.data.events);
-        setAttendees(response.data.attendees);
+        const response = await axios.get("/events");
+        setEvents(response.data);
       } catch (error) {
-        setError("Error fetching admin data. Please try again.");
-      } finally {
-        setLoading(false); // Set loading to false after fetching
+        console.error("Failed to load events");
       }
     };
 
-    fetchData();
+    fetchEvents();
   }, []);
 
-  const handleEventCreated = (newEvent) => {
-    // Update the events list with the new event
-    setEvents((prevEvents) => [...prevEvents, newEvent]);
+  // Create Event Handler
+  const handleCreateEvent = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("/events", newEvent);
+      setEvents([...events, response.data]);
+      // Clear form after successful creation
+      setNewEvent({
+        title: "",
+        description: "",
+        date: "",
+        location: "",
+        ticket_available: 0,
+      });
+    } catch (error) {
+      console.error("Failed to create event");
+    }
+  };
+
+  // Edit Event Handler
+  const handleEditEvent = async (id, updatedEvent) => {
+    try {
+      const response = await axios.put(`/events/${id}`, updatedEvent);
+      const updatedEvents = events.map((event) =>
+        event.id === id ? response.data : event
+      );
+      setEvents(updatedEvents);
+    } catch (error) {
+      console.error("Updated event");
+    }
+  };
+
+  // Delete Event Handler
+  const handleDeleteEvent = async (id) => {
+    try {
+      await axios.delete(`/events/${id}`);
+      const updatedEvents = events.filter((event) => event.id !== id);
+      setEvents(updatedEvents);
+    } catch (error) {
+      console.error("Failed to delete event");
+    }
+  };
+
+  // Handle form input changes for the new event
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewEvent({
+      ...newEvent,
+      [name]: value,
+    });
   };
 
   return (
     <div>
-      <h2>Admin Dashboard</h2>
-      {loading ? (
-        <p>Loading...</p> // Display loading state
-      ) : (
-        <>
-          {error && <p>{error}</p>}
+      <h1>Admin Dashboard</h1>
 
-          <h3>Attendees</h3>
-          {attendees.length > 0 ? (
-            <ul>
-              {attendees.map((attendee) => (
-                <li key={attendee.id}>{attendee.name}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>No attendees found.</p>
-          )}
-
-          <h3>Create New Event</h3>
-          <CreateEvent onEventCreated={handleEventCreated} />
-          <h3>Event List</h3>
-          <EventList events={events} /> {/* Display the event list */}
-        </>
-      )}
+      <CreateEvent />
+      <EventList
+        events={events}
+        onEditEvent={handleEditEvent}
+        onDeleteEvent={handleDeleteEvent}
+      />
     </div>
   );
 };

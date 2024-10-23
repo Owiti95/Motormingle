@@ -1,123 +1,93 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
-const CreateEvent = ({ onEventCreated }) => {
+const CreateEvent = () => {
   const [title, setTitle] = useState("");
-  const [date_of_event, setDateOfEvent] = useState("");
-  const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
-  const [category_id, setCategoryId] = useState("");
+  const [dateOfEvent, setDateOfEvent] = useState("");
+  const [location, setLocation] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Loading state
-  const [categories, setCategories] = useState([]); // State to hold categories
-  const [successMessage, setSuccessMessage] = useState(""); // Success message
-
-  // Fetch categories on component mount
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("http://127.0.0.1:5555/categories"); // Adjust the API endpoint accordingly
-        setCategories(response.data);
-      } catch (error) {
-        setError("Failed to load categories.");
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading state
-
-    const newEvent = {
-      title,
-      date_of_event,
-      location,
-      description,
-      category_id,
-    };
+    setError("");
+    setSuccess("");
 
     try {
-      const response = await axios.post("/admin/events", newEvent);
-      onEventCreated((prevEvents) => [...prevEvents, response.data]);
+      const response = await axios.post("/admin/dashboard/event", {
+        title,
+        description,
+        date_of_event: dateOfEvent,
+        location,
+        image_url: imageUrl,
+      });
+
+      setSuccess("Event created successfully!");
+      // Clear the form after successful submission
       setTitle("");
+      setDescription("");
       setDateOfEvent("");
       setLocation("");
-      setDescription("");
-      setCategoryId("");
-      setError("");
-      setSuccessMessage("Event created successfully!"); // Success message
-    } catch (error) {
-      setError("Failed to create event. Please check the fields.");
-    } finally {
-      setLoading(false); // Reset loading state
+      setImageUrl("");
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to create event.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-
-      <div>
-        <label>Title:</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label>Date:</label>
-        <input
-          type="date"
-          value={date_of_event}
-          onChange={(e) => setDateOfEvent(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label>Location:</label>
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label>Description:</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label>Category:</label>
-        <select
-          value={category_id}
-          onChange={(e) => setCategoryId(e.target.value)}
-          required
-        >
-          <option value="">Select a category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <button type="submit" disabled={loading}>
-        {loading ? "Creating..." : "Create Event"}
-      </button>
-    </form>
+    <div className="create-event">
+      <h2>Create Event</h2>
+      {error && <p className="error">{error}</p>}
+      {success && <p className="success">{success}</p>}
+      <form onSubmit={handleSubmit}>
+        <label>
+          Title:
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Description:
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Date of Event:
+          <input
+            type="date"
+            value={dateOfEvent}
+            onChange={(e) => setDateOfEvent(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Location:
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Image URL:
+          <input
+            type="url"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+          />
+        </label>
+        <button type="submit">Create Event</button>
+      </form>
+    </div>
   );
 };
 

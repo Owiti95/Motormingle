@@ -1,117 +1,110 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
+import { UserContext } from './UserContext'; // Import UserContext
 
 const EventDetail = () => {
-    const { id } = useParams(); // Get the event ID from the URL
-    const [event, setEvent] = useState(null); // State for storing event details
-    const [userData, setUserData] = useState(null); // State for storing user data
-    const [bookingConfirmation, setBookingConfirmation] = useState(''); // Confirmation message for booking
-    const [error, setError] = useState(null); // State for error handling
-    const [loading, setLoading] = useState(true); // State for loading indicator
-    const [categories, setCategories] = useState([]); // State for storing categories
-    const [selectedCategory, setSelectedCategory] = useState(''); // State for selected category
-    const history = useHistory(); // Hook for programmatic navigation
+    const { id } = useParams(); // Get the event ID from URL parameters
+    const [event, setEvent] = useState(null);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const history = useHistory();
+    const { currentUser } = useContext(UserContext); // Get current user from context
 
+    // Fetch event details and categories on component mount
     useEffect(() => {
-        if (!userData) {
-            history.push('/login'); // Redirect to login if no user data
-        }
-    }, [userData, history]);
-    
-    
-    useEffect(() => {
-        // Fetch event details
         const fetchEvent = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5555/events/${id}`); 
+                const response = await fetch(`/events/${id}`, {
+                    credentials: 'include',
+                });
                 if (!response.ok) throw new Error('Event not found');
                 const eventData = await response.json();
-                setEvent(eventData); // Set event data to state
+                setEvent(eventData);
             } catch (err) {
-                setError(err.message); // Set error message if fetching fails
+                setError(err.message);
             } finally {
-                setLoading(false); // Stop loading after fetching
+                setLoading(false);
             }
         };
 
-        // Fetch user data
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`http://127.0.0.1:5555/users`);
-                if (!response.ok) throw new Error('User not authenticated');
-                const userData = await response.json();
-                setUserData(userData); // Set user data to state
-            } catch (err) {
-                setError(err.message); // Set error message if fetching fails
-            }
-        };
-
-        // Fetch categories
         const fetchCategories = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5555/categories'); 
+                const response = await fetch('/categories', {
+                    credentials: 'include',
+                });
                 if (!response.ok) throw new Error('Categories not found');
                 const categoryData = await response.json();
-                setCategories(categoryData); // Set categories to state
+                setCategories(categoryData);
             } catch (err) {
-                setError(err.message); // Set error message if fetching fails
+                setError(err.message);
             }
         };
 
-        fetchEvent(); // Fetch event details
-        fetchUserData(); // Fetch user data
-        fetchCategories(); // Fetch categories
+        fetchEvent();
+        fetchCategories();
     }, [id]);
 
     // Handle RSVP booking
     const handleBooking = async () => {
-        // Check if user data is available
-        if (!userData) {
-            setError('User information is required for RSVP.');
+        if (!currentUser) { // Check if user is logged in
+            alert('You need to be logged in to RSVP.');
+            history.push('/login');
             return;
         }
 
-        // Calculate remaining tickets
-        const remainingTickets = event.available_tickets;
-        if (remainingTickets <= 0) {
-            setError('No available tickets to book.');
+        if (!selectedCategory) { // Check if a category is selected
+            alert('Please select a category.');
             return;
         }
 
-        // Make the API call to RSVP
+        setLoading(true);
+        setError(null);
+
         try {
-            const response = await fetch(`http://127.0.0.1:5555/events/${id}/rsvps`, {
+            const response = await fetch(`/events/${event.id}/rsvps`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                 },
-                body: JSON.stringify({ userId: userData.id, status: 'Attending' }), // Include user ID and status
+                credentials: 'include',
+                body: JSON.stringify({
+                    status: 'Attending', // RSVP status
+                    eventId: event.id,
+                    category: selectedCategory,
+                }),
             });
 
-            if (!response.ok) throw new Error('Failed to RSVP');
+            if (response.ok) {
+                const data = await response.json();
 
-            // Update confirmation message
-            setBookingConfirmation(`RSVP confirmed for ${userData.name} (ID: ${userData.id}) in category ${selectedCategory}`);
-            setError(null);
+                // Update the number of tickets in the frontend state
+                setEvent((prevEvent) => ({
+                    ...prevEvent,
+                    available_tickets: prevEvent.available_tickets - 1,
+                    booked_tickets: prevEvent.booked_tickets + 1,
+                }));
 
-            // Update event state with new ticket counts
-            setEvent(prevEvent => ({
-                ...prevEvent,
-                booked_tickets: prevEvent.booked_tickets + 1, // Increment booked tickets
-                available_tickets: prevEvent.available_tickets - 1, // Decrement available tickets
-            }));
+                // Display the welcome message
+                const userName = currentUser?.name || currentUser?.email || "Guest"; // Fallback to email if name is not available
+                alert(`Welcome ${userName}! ${data.message}`);
 
-            // Redirect to "My Events" after successful RSVP
-            setTimeout(() => {
-                history.push('/Myevents');
-            }, 4000);
+                history.push('/Myevents'); // Redirect to My Events
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error);
+            }
         } catch (err) {
-            setError(err.message); // Set error message if RSVP fails
+            setError('An error occurred during booking.');
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Loading and error handling
+    // Show loading or error messages if applicable
     if (loading) return <div className="loading">Loading event details...</div>;
     if (error) return <div className="error">Error: {error}</div>;
 
@@ -126,7 +119,6 @@ const EventDetail = () => {
             <p><strong>Booked Tickets:</strong> {event.booked_tickets}</p>
             <p><strong>Available Tickets:</strong> {event.available_tickets || 0}</p>
 
-            {/* Conditional rendering based on available tickets */}
             {event.available_tickets > 0 ? (
                 <>
                     <div>
@@ -134,7 +126,7 @@ const EventDetail = () => {
                         <select
                             id="category-select"
                             value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)} // Update selected category
+                            onChange={(e) => setSelectedCategory(e.target.value)}
                         >
                             <option value="">--Choose a category--</option>
                             {categories.map((category) => (
@@ -142,8 +134,8 @@ const EventDetail = () => {
                             ))}
                         </select>
                     </div>
+
                     <button onClick={handleBooking} className="booking-button">RSVP Now</button>
-                    {bookingConfirmation && <p className="booking-confirmation">{bookingConfirmation}</p>} {/* Show confirmation */}
                 </>
             ) : (
                 <p>Tickets Sold Out</p>

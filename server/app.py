@@ -3,7 +3,7 @@
 # Standard library imports
 
 # Remote library imports
-from flask import request, session
+from flask import request, session,jsonify
 from flask_restful import Api, Resource
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -11,6 +11,8 @@ from flask_bcrypt import Bcrypt
 
 # Local imports
 from config import db, app, api
+from models import User, Event, RSVP, Category
+
 
 # Set secret key for sessions
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -63,6 +65,7 @@ class Login(Resource):
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
             session['user_id'] = user.id
+            session['user_name'] = user.name
             return {"message": "Login successful", "user": user.to_dict()}, 200
         else:
             return {"error": "Invalid credentials"}, 401
@@ -99,6 +102,9 @@ class RSVPList(Resource):
         if not user_id:
             return {"error": "Unauthorized"}, 401
 
+        if status not in ['Attending', 'Not Attending']:
+            return {"error": "Invalid RSVP status"}, 400
+
         rsvp = RSVP.query.filter_by(user_id=user_id, event_id=event_id).first()
 
         if not rsvp:
@@ -109,6 +115,25 @@ class RSVPList(Resource):
 
         db.session.commit()
         return rsvp.to_dict(), 201
+    
+    def delete(self, event_id):
+        from models import RSVP
+        user_id = session.get('user_id')
+
+        if not user_id:
+            return {"error": "Unauthorized"}, 401
+
+        # Find the RSVP for this user and event
+        rsvp = RSVP.query.filter_by(user_id=user_id, event_id=event_id).first()
+
+        if not rsvp:
+            return {"error": "RSVP not found"}, 404
+
+        # Delete the RSVP
+        db.session.delete(rsvp)
+        db.session.commit()
+
+        return {"message": "RSVP canceled"}, 200
     
 class UserRsvps(Resource):
     def get(self):
@@ -121,6 +146,35 @@ class UserRsvps(Resource):
         rsvps = RSVP.query.filter_by(user_id=user_id).all()
         return [rsvp.to_dict() for rsvp in rsvps], 200
 
+    def delete(self, event_id):
+        from models import RSVP
+        user_id = session.get('user_id')
+
+        if not user_id:
+            return {"error": "Unauthorized"}, 401
+
+        # Find the RSVP for this user and event
+        rsvp = RSVP.query.filter_by(user_id=user_id, event_id=event_id).first()
+
+        if not rsvp:
+            return {"error": "RSVP not found"}, 404
+
+        # Delete the RSVP
+        db.session.delete(rsvp)
+        db.session.commit()
+
+        return {"message": "RSVP canceled"}, 200
+
+class CategoryList(Resource):
+    def get(self):
+        categories = Category.query.all()
+        return [category.to_dict() for category in categories], 200
+    
+class UserList(Resource):
+    def get(self):
+        users = User.query.all()
+        return [user.to_dict() for user in users], 200
+ 
 # Admin-specific dashboard for managing events and attendees
 class AdminDashboard(Resource):
     def get(self):
@@ -241,8 +295,10 @@ api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 api.add_resource(EventList, '/events')
 api.add_resource(EventDetail, '/events/<int:event_id>')  # New route for fetching an event by ID
-api.add_resource(RSVPList, '/events/<int:event_id>/rsvps')
-api.add_resource(UserRsvps, '/events/my-rsvps')
+api.add_resource(RSVPList, '/events/<int:event_id>/rsvps',methods =['GET', 'POST', 'DELETE'])
+api.add_resource(UserRsvps, '/events/my-rsvps',methods=['GET','DELETE'])
+api.add_resource(CategoryList, '/categories')
+api.add_resource(UserList, '/user' )
 
 
 # Admin routes
@@ -251,5 +307,6 @@ api.add_resource(AdminEvent, '/admin/dashboard/event')  # POST for creating new 
 api.add_resource(AdminEventDetail, '/admin/dashboard/event/<int:event_id>')  # PATCH and DELETE for specific event
 api.add_resource(AdminEventAttendees, '/admin/dashboard/event/<int:event_id>/attendees')
 api.add_resource(CheckAdminStatus, '/check-admin-status')
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

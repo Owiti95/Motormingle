@@ -1,8 +1,8 @@
-"""all migrations
+"""Initial migration
 
-Revision ID: c0b8d3fa7284
+Revision ID: b2507c9a98d7
 Revises: 
-Create Date: 2024-10-18 19:18:41.702578
+Create Date: 2024-10-24 09:29:33.477790
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c0b8d3fa7284'
+revision = 'b2507c9a98d7'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -37,12 +37,15 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
-    sa.Column('date_of_event', sa.DateTime(), nullable=False),
+    sa.Column('date_of_event', sa.String(), nullable=False),
     sa.Column('location', sa.String(), nullable=False),
+    sa.Column('image_url', sa.String(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('category_id', sa.Integer(), nullable=True),
     sa.Column('time', sa.Time(), nullable=False),
     sa.Column('booked_tickets', sa.Integer(), nullable=True),
     sa.Column('available_tickets', sa.Integer(), nullable=True),
-    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], name=op.f('fk_events_category_id_categories')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_events_user_id_users')),
     sa.PrimaryKeyConstraint('id')
     )

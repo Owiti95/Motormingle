@@ -26,7 +26,7 @@ class User(db.Model, SerializerMixin):
     is_admin = db.Column(db.Boolean, default=False)  # Boolean field to check if the user is an admin
     
     
-   
+
     # one user can have multiple RSVPs (One-to-Many relationship)
     rsvps = db.relationship('RSVP', back_populates='user')
     
@@ -79,6 +79,9 @@ class Event(db.Model, SerializerMixin):
     image_url = db.Column(db.String)  # Add image URL field
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    time = db.Column(db.Time, nullable=False) 
+    booked_tickets = db.Column(db.Integer, default=0)  # Default to 0
+    available_tickets = db.Column(db.Integer, default=0)
 
     # one event can have multiple RSVPs (one-to-many relationship)
     rsvps = db.relationship('RSVP', back_populates='event')  # Connects Event with RSVP

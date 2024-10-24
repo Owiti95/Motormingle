@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import EventList from "./EventList"; // Assuming you have EventList component for listing events
 import CreateEvent from "./CreateEvent";
+import "../index.css";
 
 const AdminDashboard = () => {
   const [events, setEvents] = useState([]);
@@ -54,7 +55,7 @@ const AdminDashboard = () => {
       );
       setEvents(updatedEvents);
     } catch (error) {
-      console.error("Updated event");
+      console.error("Failed to update event");
     }
   };
 
@@ -79,10 +80,17 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
+    <div className="admin-dashboard">
+      <h1 className="page-title">Admin Dashboard</h1>
 
-      <CreateEvent />
+      <div className="create-event-section">
+        <CreateEvent
+          onSubmit={handleCreateEvent}
+          newEvent={newEvent}
+          onInputChange={handleInputChange}
+        />
+      </div>
+
       <EventList
         events={events}
         onEditEvent={handleEditEvent}

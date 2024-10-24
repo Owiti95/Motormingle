@@ -1,93 +1,223 @@
 .event-list {
-  padding: 20px;
+  padding: 40px 20px;
+  background-color: black; /* Yellow background */
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2.5em;
+  color: orange;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.search-input {
+  padding: 10px;
+  width: 300px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+  transition: border 0.3s;
+}
+
+.search-input:focus {
+  border: 1px solid orange; /* Orange border on focus */
+}
+
+.search-button {
+  padding: 10px 15px;
+  background-color: grey;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search-button:hover {
+  background-color: orange; /* Darker orange on hover */
 }
 
 .event-cards-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 20px; /* Gap between cards */
 }
 
 .event-card {
-  background: #fff;
-  border: 1px solid #ddd;
+  background: #000; /* Black background for event cards */
+  color: #fff; /* White text for readability */
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-  padding: 15px;
-  width: 300px; /* Fixed width for uniformity */
-  height: 400px; /* Fixed height for uniformity */
-  display: flex;
-  flex-direction: column; /* Stack content vertically */
-  justify-content: space-between; /* Space between elements */
-  transition: transform 0.2s;
-  overflow: hidden; /* Prevent content overflow */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  width: 300px;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .event-card:hover {
-  transform: scale(1.02); /* Slight scale effect on hover */
+  transform: translateY(-5px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .event-image {
   width: 100%;
-  height: 200px; /* Fixed height for the image */
-  object-fit: cover; /* Maintain aspect ratio and cover the area */
-  border-radius: 8px; /* Rounded corners */
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
 }
 
 .event-title {
   font-size: 1.5em;
-  margin: 10px 0 5px 0;
+  margin-bottom: 10px;
+  color: orange; /* Color for the title */
 }
 
-.event-location {
+.event-location,
+.event-date {
+  color: black; /* Lighter color for readability */
   margin-bottom: 10px;
 }
 
+.event-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.edit-button,
+.delete-button,
 .book-now-button {
-  display: inline-block;
-  margin-top: auto; /* Push button to the bottom */
   padding: 10px 15px;
-  background-color: #28a745; /* Green background for button */
-  color: white;
-  text-decoration: none;
+  border: none;
   border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
   transition: background-color 0.3s;
 }
 
-.book-now-button:hover {
+.edit-button {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+
+.edit-button:hover {
   background-color: #218838; /* Darker green on hover */
+}
+
+.delete-button {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+.book-now-button {
+  background-color: grey; /* Grey */
+  color: white;
+  text-decoration: none;
+}
+
+.book-now-button:hover {
+  background-color: orange; /* Darker orange on hover */
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+
+/* Additional styles can remain unchanged */
+
+.edit-button,
+.delete-button,
+.book-now-button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.edit-button {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+.delete-button {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+.book-now-button {
+  background-color: grey; /* Blue */
+  color: white;
+  text-decoration: none;
+}
+
+.book-now-button:hover {
+  background-color: orange; /* Darker blue on hover */
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .event-detail {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  background: #fff;
+  background-color: #f9f9f9; /* Light background for the detail page */
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.event-detail h1 {
-  font-size: 2em;
+
+.event-info {
   margin-bottom: 20px;
+  font-size: 1.1em;
 }
 
-.event-image-detail {
-  width: 100%;
-  max-height: 400px;
-  object-fit: cover;
-  margin-bottom: 20px;
-  border-radius: 8px;
+.rsvp-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.event-detail p {
-  font-size: 1.2em;
-  margin: 10px 0;
+.category-select {
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 .rsvp-button {
-  background-color: #28a745; /* Green color */
+  background-color: orange; /* Green button */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -101,8 +231,8 @@
   background-color: #218838; /* Darker green on hover */
 }
 
-.back-to-events-button {
-  background-color: #007bff; /* Blue color */
+.cancel-rsvp-button {
+  background-color: orange; /* Green button */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -111,15 +241,42 @@
   font-size: 16px;
   transition: background-color 0.3s ease;
 }
-
-.back-to-events-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+.cancel-rsvp-button:hover {
+  background-color: red;
 }
+
+.back-to-events {
+  display: inline-block;
+  margin-top: 20px;
+  color: #007bff; /* Link color */
+  text-decoration: none;
+  font-size: 1.1em;
+}
+
+.back-to-events:hover {
+  text-decoration: underline; /* Underline on hover */
+}
+
+.sold-out {
+  color: red; /* Red color for sold-out message */
+  font-weight: bold;
+  text-align: center;
+}
+
 
 nav {
   background-color: #333; /* Dark background for the navbar */
   padding: 10px 20px; /* Padding for the navbar */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+  display: flex; /* Align items in a row */
+  justify-content: space-between; /* Space between brand and items */
+  align-items: center; /* Center items vertically */
+}
+
+nav .brand {
+  font-size: 1.5em; /* Increase font size for brand */
+  color: white; /* White text for brand */
+  text-decoration: none; /* Remove underline */
 }
 
 nav ul {
@@ -144,6 +301,10 @@ nav a:hover {
   color: #ff6347; /* Change link color on hover */
 }
 
+nav a.active {
+  color: #ff6347; /* Highlight active link */
+}
+
 nav button {
   background-color: #ff6347; /* Button background color */
   color: white; /* Button text color */
@@ -158,9 +319,61 @@ nav button:hover {
   background-color: #e5533d; /* Darker button color on hover */
 }
 
+/* Responsive styles */
+@media (max-width: 600px) {
+  nav ul {
+    flex-direction: column; /* Stack items vertically on small screens */
+    align-items: flex-start; /* Align items to the start */
+  }
+
+  nav li {
+    margin-bottom: 10px; /* Space between vertical items */
+  }
+}
+
+/* CSS for MyEvents component */
+.my-events {
+  padding: 40px 20px; /* Add padding around the my-events container */
+  background-color: black; /* Change background color to black for contrast */
+  color: black; /* Set text color to white for better visibility */
+}
+
+.my-events h1 {
+  color: orange; /* Change heading color to orange */
+}
+
+.event-card {
+  background: black; /* Darker background for event cards for contrast */
+  color: black; /* White text for readability */
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  width: 300px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+
 /* Admin Dashboard Buttons */
+
+.admin-dashboard {
+  padding: 20px; /* Add padding to the dashboard */
+}
+
+.create-event-section {
+  background-color: black; /* Black background */
+  color: orange; /* Orange text */
+  padding: 20px; /* Padding around the section */
+  border-radius: 8px; /* Rounded corners */
+  margin-bottom: 20px; /* Space below the section */
+}
+
+.create-event-section h2{
+  color: orange; /* Orange color for the heading */
+  text-align: center; /* Center heading */
+}
 .edit-button {
-  background-color: green; /* Blue color for edit button */
+  background-color: grey; /* Blue color for edit button */
   color: white;
   border: none;
   padding: 10px 15px;
@@ -173,7 +386,7 @@ nav button:hover {
 }
 
 .edit-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: orange; /* Darker blue on hover */
 }
 
 .delete-button {
@@ -213,4 +426,259 @@ nav button:hover {
 .event-list {
   display: flex;
   flex-direction: column; /* Stack event cards vertically */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Root container */
+.root-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0; /* Remove margin */
+  padding: 0; /* Remove padding */
+}
+
+/* Background Carousel */
+.background-carousel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  animation: carousel 12s infinite;
+}
+
+.img-1 {
+  background-image: url('https://www.affordableluxurytravel.co.uk/blog/wp-content/uploads/2024/08/formula-1-race.jpg');
+}
+
+.img-3 {
+  background-image: url('https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?cs=srgb&dl=pexels-mayday-1545743.jpg&fm=jpg');
+  animation-delay: 8s;
+}
+
+.img-4 {
+  background-image: url('https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg?cs=srgb&dl=pexels-mikebirdy-120049.jpg&fm=jpg');
+  animation-delay: 8s;
+}
+
+.img-5 {
+  background-image: url('https://images.pexels.com/photos/3729464/pexels-photo-3729464.jpeg?cs=srgb&dl=pexels-mikebirdy-3729464.jpg&fm=jpg');
+  animation-delay: 8s;
+}
+
+.img-6 {
+  background-image: url('https://img.goodfon.com/original/3840x2160/3/e5/porsche-car-cars-sport-car-high-performance-performance-se-3.jpg');
+  animation-delay: 8s;
+}
+
+@keyframes carousel {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  50% { opacity: 1; }
+  75% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Overlay to darken the background for better readability */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Centered content with welcome text and buttons */
+.content {
+  text-align: center;
+  color: #FFA500;
+}
+
+.content h1 {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.content h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #fff;
+}
+
+/* Button styles */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.button {
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  text-decoration: none;
+  color: white;
+  background-color: #FF4500;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: goldenrod;
+}
+
+.login-button {
+  background-color: grey;
+}
+
+.signup-button {
+  background-color: grey;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .content h1 {
+    font-size: 2.5rem;
+  }
+
+  .content h2 {
+    font-size: 1.5rem;
+  }
+
+  .button {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}
+
+.guest-button {
+  background-color: grey; /* Green color for guest button */
+}
+
+.guest-button:hover {
+  background-color: goldenrod; /* Darker green on hover */
+}
+/* Login Page Styles */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7); /* Dark background */
+  background-image: url('https://img.goodfon.com/original/3840x2160/3/e5/porsche-car-cars-sport-car-high-performance-performance-se-3.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.login-form-wrapper {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  text-align: center;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-form button {
+  width: 100%;
+  padding: 10px;
+  background-color: orange;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #28a745;
+}
+
+.login-form-wrapper h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-form-wrapper {
+    width: 90%;
+  }
+}
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  background-image: url('https://img.goodfon.com/original/3840x2160/3/e5/porsche-car-cars-sport-car-high-performance-performance-se-3.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.register-form {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  width: 300px; /* Fixed width for uniformity */
+}
+
+.register-form input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.register-form button {
+  padding: 10px;
+  background-color: orange;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.register-form button:hover {
+  background-color: #218838;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
 }

@@ -1,6 +1,6 @@
 from config import db, app
 from models import User, Event, RSVP, Category
-from datetime import datetime
+from datetime import datetime, time
 from flask_bcrypt import Bcrypt
 
 # Initialize Bcrypt for password hashing
@@ -56,50 +56,68 @@ with app.app_context():
             Event(
                 title="Formula 1 Tournament",
                 description="Join fellow motorsport enthusiasts for an experience of Formula 1 excitement simulation",
-                date_of_event=datetime(2024, 11, 1).strftime('%Y-%m-%d'),
+                date_of_event=datetime(2024, 11, 1).date(),  # Only the date
+                time=time(14, 0),  # Example: 2 PM
                 location="Gamers Arcade",
                 image_url="https://www.affordableluxurytravel.co.uk/blog/wp-content/uploads/2024/08/formula-1-race.jpg",
-                user_id=1
+                user_id=1,
+                booked_tickets=0,  # Initialize with 0 booked tickets
+                available_tickets=100  # Example: 100 tickets available
             ),
             Event(
                 title="Off Road Adventure",
                 description="An off-road adventure with 4x4 vehicles",
-                date_of_event=datetime(2024, 11, 15).strftime('%Y-%m-%d'),
+                date_of_event=datetime(2024, 11, 15).date(),
+                time=time(10, 0),  # Example: 10 AM
                 location="Lodwar",
                 image_url="https://play-lh.googleusercontent.com/yzzfCuM1q4tRbG1GhH5Z07m6yMNGFxQ7yN3x8E9nzznBioNAPX6nAJO8ccg7we3OnIuJ",
-                user_id=2
+                user_id=2,
+                booked_tickets=0,
+                available_tickets=50
             ),
             Event(
                 title="Car Auction",
                 description="Get the best deals",
-                date_of_event=datetime(2024, 12, 10).strftime('%Y-%m-%d'),
+                date_of_event=datetime(2024, 12, 10).date(),
+                time=time(18, 0),  # Example: 6 PM
                 location="Nairobi",
                 image_url="https://gusarov-group.by/wp-content/uploads/2019/04/bidcar-auction-9.jpg",
-                user_id=3
+                user_id=3,
+                booked_tickets=0,
+                available_tickets=200
             ),
             Event(
                 title="Expo",
                 description="Explore and discover",
-                date_of_event=datetime(2024, 12, 5).strftime('%Y-%m-%d'),
+                date_of_event=datetime(2024, 12, 5).date(),
+                time=time(11, 30),  # Example: 11:30 AM
                 location="Nairobi",
                 image_url="https://static.autox.com/uploads/2023/01/Toyota-BZ4X-EV-1-.jpg",
-                user_id=4
+                user_id=4,
+                booked_tickets=0,
+                available_tickets=150
             ),
             Event(
                 title="Turbo Dogs",
                 description="Top drivers compete",
-                date_of_event=datetime(2024, 12, 20).strftime('%Y-%m-%d'),
+                date_of_event=datetime(2024, 12, 20).date(),
+                time=time(19, 0),  # Example: 7 PM
                 location="Kisumu",
                 image_url="https://b1858697.smushcdn.com/1858697/wp-content/uploads/2018/05/9story-Turbo-Dogs-006.jpg?lossy=1&strip=1&webp=1",
-                user_id=5
+                user_id=5,
+                booked_tickets=0,
+                available_tickets=75
             ),
             Event(
                 title="Racing Championship",
                 description="Top drivers compete",
-                date_of_event=datetime(2024, 12, 25).strftime('%Y-%m-%d'),
+                date_of_event=datetime(2024, 12, 25).date(),
+                time=time(16, 0),  # Example: 4 PM
                 location="Nairobi",
                 image_url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU03EzR5PraKLFJPEttBZX45SXG5fDQxI4Qg&s",
-                user_id=6
+                user_id=6,
+                booked_tickets=0,
+                available_tickets=120
             ),
         ]
         
@@ -152,4 +170,4 @@ with app.app_context():
     except Exception as e:
         print(f"Error associating events and categories: {e}")
 
-print("Seeded the database successfully.")
+print("Seeding complete.")

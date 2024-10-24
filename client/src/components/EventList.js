@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useLocation } from "react-router-dom"; // Import useLocation
+import { Link, useLocation } from "react-router-dom";
 import "../index.css"; // Import the updated CSS file
 
 const EventList = () => {
   const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false); // State to check if user is admin
-  const location = useLocation(); // Get the current location
+  const [isAdmin, setIsAdmin] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get("/events");
         setEvents(response.data);
+        setFilteredEvents(response.data);
       } catch (err) {
         setError("Failed to load events.");
       }
@@ -21,8 +24,8 @@ const EventList = () => {
 
     const checkAdminStatus = async () => {
       try {
-        const response = await axios.get("/check-admin-status"); // Hypothetical endpoint
-        setIsAdmin(response.data.isAdmin); // Assuming the API returns { isAdmin: true/false }
+        const response = await axios.get("/check-admin-status");
+        setIsAdmin(response.data.isAdmin);
       } catch (err) {
         console.error("Error checking admin status:", err);
       }
@@ -34,19 +37,45 @@ const EventList = () => {
 
   const deleteEvent = async (eventId) => {
     try {
-      await axios.delete(`/admin/dashboard/event/${eventId}`); // API call to delete the event
-      setEvents(events.filter((event) => event.id !== eventId)); // Update the state to remove the deleted event
+      await axios.delete(`/admin/dashboard/event/${eventId}`);
+      setEvents(events.filter((event) => event.id !== eventId));
+      setFilteredEvents(filteredEvents.filter((event) => event.id !== eventId));
     } catch (err) {
       setError("Failed to delete event.");
     }
   };
 
+  const handleSearch = () => {
+    const filtered = events.filter(
+      (event) =>
+        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredEvents(filtered);
+  };
+
   return (
     <div className="event-list">
-      {error && <p>{error}</p>}
-      <h1>Motormingle</h1>
+      {error && <p className="error-message">{error}</p>}
+      <h1 className="page-title">
+        <i>Motormingle</i>
+      </h1>
+
+      <div className="search-form">
+        <input
+          type="text"
+          placeholder="Search event by title or location"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+        <button onClick={handleSearch} className="search-button">
+          Search
+        </button>
+      </div>
+
       <div className="event-cards-container">
-        {events.map((event) => (
+        {filteredEvents.map((event) => (
           <div className="event-card" key={event.id}>
             {event.image_url && (
               <img
@@ -61,23 +90,22 @@ const EventList = () => {
               Date: {new Date(event.date_of_event).toLocaleDateString()}
             </p>
             <div className="event-buttons">
-              {isAdmin &&
-                location.pathname !== "/" && ( // Check if the current path is not the root page
-                  <>
-                    <Link
-                      to={`/admin/dashboard/event/${event.id}/edit`}
-                      className="edit-button"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => deleteEvent(event.id)}
-                      className="delete-button"
-                    >
-                      Delete
-                    </button>
-                  </>
-                )}
+              {isAdmin && location.pathname !== "/" && (
+                <>
+                  <Link
+                    to={`/admin/dashboard/event/${event.id}/edit`}
+                    className="edit-button"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => deleteEvent(event.id)}
+                    className="delete-button"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
               <Link to={`/events/${event.id}`} className="book-now-button">
                 View Details
               </Link>

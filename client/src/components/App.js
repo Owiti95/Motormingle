@@ -9,7 +9,8 @@ import { UserProvider } from "./UserContext";
 import NavBar from "./NavBar";
 import ProtectedRoute from "./RouteProtection";
 import EditEvent from "./EditEvent";
-import MyEvents from "./MyEvents";
+import MyEvents from "./Myevents";
+import Home from "./Home";
 
 const App = () => {
   return (
@@ -17,12 +18,13 @@ const App = () => {
       <Router>
         <NavBar />
         <Switch>
-          <Route path="/" exact component={EventList} />
+          <Route path="/" exact component={Home} />
+          <Route path="/events" exact component={EventList} />
           <Route path="/events/:id" component={EventDetail} />{" "}
           <Route path="/login" component={Login} />
           <Route path="/admin/dashboard/event/:id/edit" component={EditEvent} />
           <Route path="/register" component={Register} />
-          <Route path="/my-events" component={MyEvents} />
+          <Route path="/Myevents" component={MyEvents} />
           <ProtectedRoute path="/admin" component={AdminDashboard} />
         </Switch>
       </Router>

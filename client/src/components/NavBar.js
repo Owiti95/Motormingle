@@ -1,24 +1,52 @@
 import React, { useContext } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { UserContext } from "./UserContext";
+import "../index.css";
 
 const NavBar = () => {
-  const { currentUser, setCurrentUser } = useContext(UserContext); // Access currentUser and setCurrentUser
+  const { currentUser, setCurrentUser } = useContext(UserContext);
   const history = useHistory();
+  const location = useLocation();
 
   const handleLogout = () => {
-    // Clear user session or token
-    setCurrentUser(null); // Clear the current user context
-    history.push("/"); // Redirect to the root page after logout
+    setCurrentUser(null);
+    history.push("/");
   };
+
+  // Check if the current path is the root path
+  if (location.pathname === "/") {
+    return null;
+  }
 
   return (
     <nav>
+      <div className="brand">
+        <Link to="/">MotorMingle</Link>
+      </div>
       <ul>
         <li>
-          <Link to="/">Home</Link>
+          <Link to="/" className={location.pathname === "/" ? "active" : ""}>
+            Home
+          </Link>
         </li>
-        {/* Conditionally render Sign Up and Login links */}
+        <li>
+          <Link
+            to="/events"
+            className={location.pathname === "/events" ? "active" : ""}
+          >
+            Events
+          </Link>
+        </li>
+        {currentUser && ( // Only render My Events if currentUser is defined
+          <li>
+            <Link
+              to="/Myevents"
+              className={location.pathname === "/Myevents" ? "active" : ""}
+            >
+              My Events
+            </Link>
+          </li>
+        )}
         {!currentUser && (
           <>
             <li>
@@ -29,13 +57,11 @@ const NavBar = () => {
             </li>
           </>
         )}
-        {/* Render Admin Dashboard link only if user is an admin */}
         {currentUser && currentUser.is_admin && (
           <li>
             <Link to="/admin">Admin Dashboard</Link>
           </li>
         )}
-        {/* Render Logout button only if user is logged in */}
         {currentUser && (
           <li>
             <button onClick={handleLogout}>Logout</button>

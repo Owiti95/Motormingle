@@ -11,6 +11,7 @@ import ProtectedRoute from "./RouteProtection";
 import EditEvent from "./EditEvent";
 import MyEvents from "./Myevents";
 import Home from "./Home";
+import Attendees from "./Attendees";
 
 const App = () => {
   return (
@@ -23,6 +24,10 @@ const App = () => {
           <Route path="/events/:id" component={EventDetail} />{" "}
           <Route path="/login" component={Login} />
           <Route path="/admin/dashboard/event/:id/edit" component={EditEvent} />
+          <Route
+            path="/admin/dashboard/event/:eventId/attendees"
+            component={Attendees}
+          />
           <Route path="/register" component={Register} />
           <Route path="/Myevents" component={MyEvents} />
           <ProtectedRoute path="/admin" component={AdminDashboard} />

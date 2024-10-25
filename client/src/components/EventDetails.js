@@ -87,7 +87,7 @@ const EventDetail = () => {
           booked_tickets: prevEvent.booked_tickets + 1,
         }));
         const userName = currentUser?.name || currentUser?.email || "Guest";
-        alert(`Welcome ${userName}! ${data.message}`);
+        alert(`Welcome ${userName}!`);
         history.push("/Myevents");
       } else {
         const errorData = await response.json();

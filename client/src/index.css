@@ -418,6 +418,92 @@ nav button:hover {
   margin: 0 0 10px 0; /* Add margin for spacing */
 }
 
+.edit-event-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9; /* Light background color */
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333; /* Darker text color */
+}
+
+.error-message {
+  color: red; /* Red color for error messages */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.edit-event-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: black; /* Black background */
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  color: orange; /* Orange text */
+}
+
+h1 {
+  text-align: center;
+  color: orange; /* Orange color for the heading */
+}
+
+.error-message {
+  color: red; /* Red for error messages */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.edit-event-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  margin-bottom: 5px;
+  font-weight: bold; /* Bold labels */
+  color: orange; /* Orange labels */
+}
+
+.form-input {
+  padding: 10px;
+  border: 1px solid orange; /* Orange border */
+  border-radius: 4px;
+  width: 100%;
+  background-color: #333; /* Dark background for inputs */
+  color: white; /* White text for inputs */
+}
+
+.form-input:focus {
+  border-color: orange; /* Lighter orange for focus */
+  outline: none;
+}
+
+.submit-button {
+  padding: 10px;
+  background-color: orange; /* Orange button color */
+  color: black; /* Black text for button */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.submit-button:hover {
+  background-color: orange; /* Darker orange on hover */
+}
+
+
+
 /* Other Styles */
 .admin-dashboard {
   padding: 20px; /* Add padding to the dashboard */

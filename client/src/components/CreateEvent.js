@@ -5,8 +5,11 @@ const CreateEvent = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dateOfEvent, setDateOfEvent] = useState("");
+  const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
+  const [availableTickets, setAvailableTickets] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -20,8 +23,11 @@ const CreateEvent = () => {
         title,
         description,
         date_of_event: dateOfEvent,
+        time,
         location,
+        available_tickets: availableTickets,
         image_url: imageUrl,
+        category_id: categoryId,
       });
 
       setSuccess("Event created successfully!");
@@ -29,8 +35,11 @@ const CreateEvent = () => {
       setTitle("");
       setDescription("");
       setDateOfEvent("");
+      setTime("");
       setLocation("");
+      setAvailableTickets(0);
       setImageUrl("");
+      setCategoryId("");
     } catch (err) {
       setError(err.response?.data?.error || "Failed to create event.");
     }
@@ -69,6 +78,15 @@ const CreateEvent = () => {
           />
         </label>
         <label>
+          Time of Event:
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            required
+          />
+        </label>
+        <label>
           Location:
           <input
             type="text"
@@ -78,11 +96,28 @@ const CreateEvent = () => {
           />
         </label>
         <label>
+          Available Tickets:
+          <input
+            type="number"
+            value={availableTickets}
+            onChange={(e) => setAvailableTickets(e.target.value)}
+            required
+          />
+        </label>
+        <label>
           Image URL:
           <input
             type="url"
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
+          />
+        </label>
+        <label>
+          Category ID:
+          <input
+            type="number"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
           />
         </label>
         <button type="submit">Create Event</button>

@@ -88,6 +88,7 @@ class RSVPList(Resource):
         return [rsvp.to_dict() for rsvp in rsvps], 200
     
     def post(self, event_id):
+        from models import RSVP, Event
         data = request.json
         status = data.get('status')
         user_id = session.get('user_id')
@@ -99,15 +100,43 @@ class RSVPList(Resource):
             return {"error": "Invalid RSVP status"}, 400
 
         rsvp = RSVP.query.filter_by(user_id=user_id, event_id=event_id).first()
+        event = Event.query.get(event_id)
+
+        if not event:
+            return {"error": "Event not found"}, 404
 
         if not rsvp:
-            rsvp = RSVP(status=status, user_id=user_id, event_id=event_id)
-            db.session.add(rsvp)
+            if event.available_tickets > 0:
+                # Create a new RSVP and decrement available tickets
+                rsvp = RSVP(status=status, user_id=user_id, event_id=event_id)
+                db.session.add(rsvp)
+                event.available_tickets -= 1
+                event.booked_tickets += 1
+            else:
+                return {"error": "No available tickets"}, 400
         else:
+            # Update RSVP status only if changing to "Attending"
+            if status == "Attending" and rsvp.status != "Attending":
+                if event.available_tickets > 0:
+                    event.available_tickets -= 1
+                    event.booked_tickets += 1
+                else:
+                    return {"error": "No available tickets"}, 400
+            elif status == "Not Attending" and rsvp.status == "Attending":
+                # If changing to "Not Attending", adjust ticket counts
+                event.available_tickets += 1
+                event.booked_tickets -= 1
+
             rsvp.status = status
 
-        db.session.commit()
-        return rsvp.to_dict(), 201
+        db.session.commit()  # Commit changes to the database
+
+        # Return the updated ticket information along with RSVP data
+        return {
+            "rsvp": rsvp.to_dict(),
+            "available_tickets": event.available_tickets,
+            "booked_tickets": event.booked_tickets
+        }, 201
     
     def delete(self, event_id):
         user_id = session.get('user_id')
@@ -246,7 +275,7 @@ class AdminEventDetail(Resource):
             db.session.commit()
             return {"message": "Event deleted"}, 200
         else:
-            return {"error": "Event not found"}, 404
+            return {"error": "Event not found"}, 404    
 
 # Admin-specific route for viewing attendees
 class AdminEventAttendees(Resource):

@@ -64,6 +64,13 @@ const EventDetail = () => {
     setLoading(true);
     setError(null);
 
+    // Calculate remaining tickets
+    const remainingTickets = event.available_tickets;
+    if (remainingTickets <= 0) {
+      setError("No available tickets to book.");
+      return;
+    }
+
     try {
       const response = await fetch(`/events/${event.id}/rsvps`, {
         method: "POST",
@@ -86,6 +93,7 @@ const EventDetail = () => {
           available_tickets: prevEvent.available_tickets - 1,
           booked_tickets: prevEvent.booked_tickets + 1,
         }));
+
         const userName = currentUser?.name || currentUser?.email || "Guest";
         alert(`Welcome ${userName}!`);
         history.push("/Myevents");

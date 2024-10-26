@@ -49,7 +49,7 @@ const AdminDashboard = () => {
   // Edit Event Handler
   const handleEditEvent = async (id, updatedEvent) => {
     try {
-      const response = await axios.put(`/events/${id}`, updatedEvent);
+      const response = await axios.put(`https://server-ai40.onrender.com/events/events/${id}`, updatedEvent);
       const updatedEvents = events.map((event) =>
         event.id === id ? response.data : event
       );

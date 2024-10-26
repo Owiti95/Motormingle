@@ -14,7 +14,7 @@ const BookingDetail = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`http://localhost:5555/events/${id}`);
+        const response = await fetch(`https://server-ai40.onrender.com/events/${id}`);
         if (!response.ok) {
           throw new Error("Event not found");
         }

@@ -11,7 +11,7 @@ const Attendees = () => {
     const fetchAttendees = async () => {
       try {
         const response = await axios.get(
-          `/admin/dashboard/event/${eventId}/attendees`
+          `https://server-ai40.onrender.com/admin/dashboard/event/${eventId}/attendees`
         );
         setAttendees(response.data);
       } catch (err) {

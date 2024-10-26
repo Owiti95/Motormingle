@@ -19,7 +19,7 @@ const CreateEvent = () => {
     setSuccess("");
 
     try {
-      const response = await axios.post("/admin/dashboard/event", {
+      const response = await axios.post("https://server-ai40.onrender.com/admin/dashboard/event", {
         title,
         description,
         date_of_event: dateOfEvent,

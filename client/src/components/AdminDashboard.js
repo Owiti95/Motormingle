@@ -17,7 +17,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get("/events");
+        const response = await axios.get("https://server-ai40.onrender.com/events");
         setEvents(response.data);
       } catch (error) {
         console.error("Failed to load events");
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   const handleCreateEvent = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/events", newEvent);
+      const response = await axios.post("https://server-ai40.onrender.com/events", newEvent);
       setEvents([...events, response.data]);
       // Clear form after successful creation
       setNewEvent({

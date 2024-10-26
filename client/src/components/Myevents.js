@@ -14,7 +14,7 @@ const MyEvents = () => {
   useEffect(() => {
     const fetchMyEvents = async () => {
       try {
-        const response = await fetch("/events/my-rsvps", {
+        const response = await fetch("https://server-ai40.onrender.com/events/my-rsvps", {
           credentials: "include", // Ensure cookies are sent with the request
         });
         if (!response.ok) throw new Error("Failed to fetch my events.");
@@ -23,7 +23,7 @@ const MyEvents = () => {
         // Fetch full event details for each RSVP
         const eventsWithDetails = await Promise.all(
           rsvpData.map(async (rsvp) => {
-            const eventResponse = await fetch(`/events/${rsvp.event_id}`, {
+            const eventResponse = await fetch(`https://server-ai40.onrender.com/events/${rsvp.event_id}`, {
               credentials: "include",
             });
             const eventData = await eventResponse.json();
@@ -45,7 +45,7 @@ const MyEvents = () => {
   // Handle canceling RSVP
   const handleCancelRSVP = async (eventId) => {
     try {
-      const response = await fetch(`/events/${eventId}/rsvps`, {
+      const response = await fetch(`https://server-ai40.onrender.com/events/${eventId}/rsvps`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

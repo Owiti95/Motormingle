@@ -11,7 +11,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/register", { name, email, password });
+      const response = await axios.post("https://server-ai40.onrender.com/register", { name, email, password });
       console.log("Registration successful:", response.data);
       // Redirect to login or events page after successful registration
     } catch (err) {

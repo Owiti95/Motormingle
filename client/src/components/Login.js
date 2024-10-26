@@ -15,7 +15,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "/login",
+        "https://server-ai40.onrender.com/login",
         { email, password },
         { withCredentials: true }
       );

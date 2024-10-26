@@ -19,7 +19,7 @@ const EditEvent = () => {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        const response = await axios.get(`/events/${id}`);
+        const response = await axios.get(`https://server-ai40.onrender.com/events/${id}`);
         setEventData(response.data);
       } catch (err) {
         setError("Failed to load event data.");
@@ -41,7 +41,7 @@ const EditEvent = () => {
         ...eventData,
         available_tickets: parseInt(eventData.available_tickets, 10),
       };
-      await axios.patch(`/admin/dashboard/event/${id}`, formattedData);
+      await axios.patch(`https://server-ai40.onrender.com/admin/dashboard/event/${id}`, formattedData);
       navigate("/admin/dashboard"); // Use navigate instead of history.push
     } catch (err) {
       setError("Failed to update event.");

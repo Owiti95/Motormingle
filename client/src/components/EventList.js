@@ -14,7 +14,7 @@ const EventList = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get("/events");
+        const response = await axios.get("https://server-ai40.onrender.com/events");
         setEvents(response.data);
         setFilteredEvents(response.data);
       } catch (err) {
@@ -24,7 +24,7 @@ const EventList = () => {
 
     const checkAdminStatus = async () => {
       try {
-        const response = await axios.get("/check-admin-status");
+        const response = await axios.get("https://server-ai40.onrender.com/check-admin-status");
         setIsAdmin(response.data.isAdmin);
       } catch (err) {
         console.error("Error checking admin status:", err);
@@ -37,7 +37,7 @@ const EventList = () => {
 
   const deleteEvent = async (eventId) => {
     try {
-      await axios.delete(`/admin/dashboard/event/${eventId}`);
+      await axios.delete(`https://server-ai40.onrender.com/admin/dashboard/event/${eventId}`);
       setEvents(events.filter((event) => event.id !== eventId));
       setFilteredEvents(filteredEvents.filter((event) => event.id !== eventId));
     } catch (err) {

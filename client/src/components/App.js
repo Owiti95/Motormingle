@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import EventList from "./EventList";
 import EventDetail from "./EventDetails";
 import Login from "./Login";
@@ -16,7 +16,7 @@ import Attendees from "./Attendees";
 const App = () => {
   return (
     <UserProvider>
-      <Router>
+      <BrowserRouter>
         <NavBar />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -29,7 +29,7 @@ const App = () => {
           <Route path="/Myevents" element={<MyEvents />} />
           <Route path="/admin" element={<ProtectedRoute component={AdminDashboard} />} />
         </Routes>
-      </Router>
+      </BrowserRouter>
     </UserProvider>
   );
 };

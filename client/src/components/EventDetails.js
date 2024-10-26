@@ -18,7 +18,7 @@ const EventDetail = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`/events/${id}`, {
+        const response = await fetch(`https://server-ai40.onrender.com/events/${id}`, {
           credentials: "include",
         });
         if (!response.ok) throw new Error("Event not found");
@@ -33,7 +33,7 @@ const EventDetail = () => {
 
     const fetchCategories = async () => {
       try {
-        const response = await fetch("/categories", {
+        const response = await fetch("https://server-ai40.onrender.com/categories", {
           credentials: "include",
         });
         if (!response.ok) throw new Error("Categories not found");
@@ -72,7 +72,7 @@ const EventDetail = () => {
     }
 
     try {
-      const response = await fetch(`/events/${event.id}/rsvps`, {
+      const response = await fetch(`https://server-ai40.onrender.com/events/${event.id}/rsvps`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

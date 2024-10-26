@@ -7,7 +7,7 @@ const RSVP = ({ eventId }) => {
 
   const handleRSVP = async () => {
     try {
-      const response = await axios.post(`/events/${eventId}/rsvps`, { status });
+      const response = await axios.post(`https://server-ai40.onrender.com/events/${eventId}/rsvps`, { status });
       console.log("RSVP successful:", response.data);
     } catch (err) {
       setError(err.response.data.error || "RSVP failed.");

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Replace useHistory with useNavigate
 import "../index.css"; // Import your styles
 
 const EditEvent = () => {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate(); // Replace useHistory with useNavigate
   const [eventData, setEventData] = useState({
     title: "",
     location: "",
@@ -42,7 +42,7 @@ const EditEvent = () => {
         available_tickets: parseInt(eventData.available_tickets, 10),
       };
       await axios.patch(`/admin/dashboard/event/${id}`, formattedData);
-      history.push("/admin/dashboard");
+      navigate("/admin/dashboard"); // Use navigate instead of history.push
     } catch (err) {
       setError("Failed to update event.");
       console.error(err.response ? err.response.data : err.message);

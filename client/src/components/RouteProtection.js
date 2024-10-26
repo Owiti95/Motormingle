@@ -1,21 +1,14 @@
 import React, { useContext } from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 
-const ProtectedRoute = ({ component: Component, ...rest }) => {
+const ProtectedRoute = ({ component: Component }) => {
   const { currentUser } = useContext(UserContext);
 
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        currentUser && currentUser.is_admin ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/login" />
-        )
-      }
-    />
+  return currentUser && currentUser.is_admin ? (
+    <Component />
+  ) : (
+    <Navigate to="/login" />
   );
 };
 

@@ -1,7 +1,7 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import EventList from "./EventList";
-import EventDetail from "./EventDetails"; // Import the EventDetail component
+import EventDetail from "./EventDetails";
 import Login from "./Login";
 import Register from "./Register";
 import AdminDashboard from "./AdminDashboard";
@@ -18,20 +18,17 @@ const App = () => {
     <UserProvider>
       <Router>
         <NavBar />
-        <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/events" exact component={EventList} />
-          <Route path="/events/:id" component={EventDetail} />{" "}
-          <Route path="/login" component={Login} />
-          <Route path="/admin/dashboard/event/:id/edit" component={EditEvent} />
-          <Route
-            path="/admin/dashboard/event/:eventId/attendees"
-            component={Attendees}
-          />
-          <Route path="/register" component={Register} />
-          <Route path="/Myevents" component={MyEvents} />
-          <ProtectedRoute path="/admin" component={AdminDashboard} />
-        </Switch>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/events" element={<EventList />} />
+          <Route path="/events/:id" element={<EventDetail />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/admin/dashboard/event/:id/edit" element={<EditEvent />} />
+          <Route path="/admin/dashboard/event/:eventId/attendees" element={<Attendees />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/Myevents" element={<MyEvents />} />
+          <Route path="/admin" element={<ProtectedRoute component={AdminDashboard} />} />
+        </Routes>
       </Router>
     </UserProvider>
   );

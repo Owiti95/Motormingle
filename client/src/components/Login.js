@@ -1,14 +1,14 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { UserContext } from "./UserContext";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setCurrentUser } = useContext(UserContext);
   const [welcomeMessage, setWelcomeMessage] = useState("");
-  const history = useHistory();
+  const navigate = useNavigate(); // Updated useNavigate hook
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ const Login = () => {
         setWelcomeMessage(`Welcome ${response.data.user.username}`);
       }
 
-      history.push("/events");
+      navigate("/events"); // Replaced history.push with navigate
     } catch (err) {
       console.error(err);
       if (err.response) {

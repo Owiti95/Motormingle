@@ -1,6 +1,6 @@
 // src/components/EventCard.js
 import React from "react";
-import "../index.css"; // Ensure this file has styles for the card
+import "../index.css";
 
 const EventCard = ({ event }) => {
   return (
@@ -10,7 +10,7 @@ const EventCard = ({ event }) => {
         <img src={event.image} alt={event.title} className="event-image" />
       )}
       <p>{event.description}</p>
-      {/* Add a link to the event detail page if needed */}
+      {}
       <button onClick={() => (window.location.href = `/events/${event.id}`)}>
         View Details
       </button>

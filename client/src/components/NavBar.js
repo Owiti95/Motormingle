@@ -1,16 +1,16 @@
 import React, { useContext } from "react";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import "../index.css";
 
 const NavBar = () => {
   const { currentUser, setCurrentUser } = useContext(UserContext);
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = () => {
     setCurrentUser(null);
-    history.push("/");
+    navigate("/");
   };
 
   // Check if the current path is the root path

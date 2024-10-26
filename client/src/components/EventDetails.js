@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useParams, Link, useHistory } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { UserContext } from "./UserContext"; // Import UserContext
 import "../index.css"; // Import CSS for EventDetail
 
 const EventDetail = () => {
   const { id } = useParams(); // Get the event ID from URL parameters
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const history = useHistory();
   const { currentUser } = useContext(UserContext); // Get current user from context
 
   // Fetch event details and categories on component mount
@@ -52,7 +52,7 @@ const EventDetail = () => {
   const handleBooking = async () => {
     if (!currentUser) {
       alert("You need to be logged in to RSVP.");
-      history.push("/login");
+      navigate("/login");
       return;
     }
 
@@ -96,7 +96,7 @@ const EventDetail = () => {
 
         const userName = currentUser?.name || currentUser?.email || "Guest";
         alert(`Welcome ${userName}!`);
-        history.push("/Myevents");
+        navigate("/Myevents");
       } else {
         const errorData = await response.json();
         alert(errorData.error);

@@ -146,3 +146,6 @@ Contributions are welcome! Please fork the repository, create a new branch for y
 ## Acknowledgments
 - Thank you to the open-source community for the libraries and frameworks used in this project.
 - Special thanks to all contributors who help improve the project.
+
+## Live link
+https://client-q8vp.vercel.app/
